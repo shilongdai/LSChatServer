@@ -6,6 +6,7 @@
 package net.viperfish.chatapplication.core;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.List;
 import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.impl.SafeFutureImpl;
@@ -23,6 +24,12 @@ public class MockWebSocket implements WebSocket {
     private List<String> broadCastData;
     private List<String> receivedData;
 
+    public MockWebSocket() {
+        sentData = new LinkedList<>();
+        broadCastData = new LinkedList<>();
+        receivedData = new LinkedList<>();
+    }
+    
     public List<String> getSentData() {
         return sentData;
     }

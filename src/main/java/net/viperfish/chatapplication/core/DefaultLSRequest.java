@@ -5,6 +5,7 @@
  */
 package net.viperfish.chatapplication.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -22,17 +23,15 @@ import org.glassfish.grizzly.websockets.WebSocket;
  */
 public class DefaultLSRequest implements LSRequest {
 
-    private String from;
-    private String to;
+    private String source;
     private Map<String, String> attributes;
     private Date timeStamp;
     private Long type;
     private String data;
-    private WebSocket socket;
+    private transient WebSocket socket;
 
-    public DefaultLSRequest(String from, String to, Map<String, String> attributes, Date timeStamp, Long type, String data, WebSocket sock) {
-        this.from = from;
-        this.to = to;
+    public DefaultLSRequest(String from, Map<String, String> attributes, Date timeStamp, Long type, String data, WebSocket sock) {
+        this.source = from;
         this.attributes = attributes;
         this.timeStamp = timeStamp;
         this.type = type;
@@ -41,8 +40,7 @@ public class DefaultLSRequest implements LSRequest {
     }
 
     public DefaultLSRequest() {
-        from = "anonymous";
-        to = "server";
+        source = "anonymous";
         attributes = new HashMap<>();
         timeStamp = new Date();
         type = 0L;
@@ -51,16 +49,10 @@ public class DefaultLSRequest implements LSRequest {
     }
 
     public void setSource(String from) {
-        this.from = from;
+        this.source = from;
     }
 
-    public String getTarget() {
-        return to;
-    }
 
-    public void setTarget(String to) {
-        this.to = to;
-    }
 
     public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
@@ -81,10 +73,11 @@ public class DefaultLSRequest implements LSRequest {
     public void setSocket(WebSocket socket) {
         this.socket = socket;
     }
+    
 
     @Override
     public String getSource() {
-        return this.from;
+        return this.source;
     }
 
     @Override
@@ -102,6 +95,7 @@ public class DefaultLSRequest implements LSRequest {
         return this.data;
     }
 
+    @JsonIgnore
     @Override
     public InputStream getInputStream() {
         return new ByteArrayInputStream(this.data.getBytes(StandardCharsets.UTF_8));
@@ -112,11 +106,13 @@ public class DefaultLSRequest implements LSRequest {
         return type;
     }
 
+    @JsonIgnore
     @Override
     public Long getContentLenth() {
         return (long) data.getBytes(StandardCharsets.UTF_8).length;
     }
 
+    @JsonIgnore
     @Override
     public Set<String> getAttributeNames() {
         Set<String> result = new HashSet<>();
@@ -131,15 +127,20 @@ public class DefaultLSRequest implements LSRequest {
         return attributes;
     }
 
+    @JsonIgnore
+    @Override
+    public WebSocket getSocket() {
+        return this.socket;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.from);
-        hash = 17 * hash + Objects.hashCode(this.to);
-        hash = 17 * hash + Objects.hashCode(this.attributes);
-        hash = 17 * hash + Objects.hashCode(this.timeStamp);
-        hash = 17 * hash + Objects.hashCode(this.type);
-        hash = 17 * hash + Objects.hashCode(this.data);
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.source);
+        hash = 97 * hash + Objects.hashCode(this.attributes);
+        hash = 97 * hash + Objects.hashCode(this.timeStamp);
+        hash = 97 * hash + Objects.hashCode(this.type);
+        hash = 97 * hash + Objects.hashCode(this.data);
         return hash;
     }
 
@@ -155,7 +156,7 @@ public class DefaultLSRequest implements LSRequest {
             return false;
         }
         final DefaultLSRequest other = (DefaultLSRequest) obj;
-        if (!Objects.equals(this.from, other.from)) {
+        if (!Objects.equals(this.source, other.source)) {
             return false;
         }
         if (!Objects.equals(this.data, other.data)) {
@@ -173,9 +174,6 @@ public class DefaultLSRequest implements LSRequest {
         return true;
     }
 
-    @Override
-    public WebSocket getSocket() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
+    
 }

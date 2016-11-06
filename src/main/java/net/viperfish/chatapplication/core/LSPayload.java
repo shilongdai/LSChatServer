@@ -9,6 +9,9 @@ package net.viperfish.chatapplication.core;
  *
  * @author sdai
  */
-public final class LSPackageProcessor {
-    
+public interface LSPayload {
+    public void setSource(String source);
+    public void setTarget(String target);
+    public void setAttribute(String attrName, String attr);
+    public void setData(String data);
 }

@@ -33,4 +33,12 @@ public class UserRegister implements UserSocketMapper, UserSocketRegister {
         mapping.put(username, socket);
     }
     
+    
+    public void unregister(String username) {
+        mapping.remove(username);
+    }
+    
+    public void clear() {
+        mapping.clear();
+    }
 }

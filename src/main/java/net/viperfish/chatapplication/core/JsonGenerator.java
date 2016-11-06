@@ -38,4 +38,5 @@ public final class JsonGenerator {
         }
         return result;
     }
+
 }

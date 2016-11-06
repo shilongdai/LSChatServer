@@ -18,7 +18,7 @@ import net.viperfish.chatapplication.core.UserDatabase;
  */
 public class RAMUserDatabase implements UserDatabase {
 
-    private Map<Long, User> mapping;
+    private Map<String, User> mapping;
     private long currentMax;
 
     public RAMUserDatabase() {
@@ -27,25 +27,25 @@ public class RAMUserDatabase implements UserDatabase {
     }
 
     @Override
-    public User get(Long id) {
+    public User get(String id) {
         return mapping.get(id);
     }
 
     @Override
     public User save(User data) {
-        data.setId(currentMax);
-        return mapping.put(currentMax++, data);
+        data.setId(currentMax++);
+        return mapping.put(data.getUsername(), data);
     }
 
     @Override
-    public void remove(Long id) {
+    public void remove(String id) {
         mapping.remove(id);
     }
 
     @Override
     public Iterable<User> findAll() {
         List<User> result = new LinkedList<>();
-        for (Map.Entry<Long, User> i : mapping.entrySet()) {
+        for (Map.Entry<String, User> i : mapping.entrySet()) {
             result.add(i.getValue());
         }
         return result;

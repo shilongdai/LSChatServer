@@ -6,6 +6,7 @@
 package net.viperfish.chatapplication.core;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ import org.glassfish.grizzly.websockets.WebSocket;
  *
  * @author sdai
  */
-public interface LSRequest {
+public interface LSRequest extends Serializable {
 
     public String getSource();
 

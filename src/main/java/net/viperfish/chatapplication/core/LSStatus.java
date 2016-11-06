@@ -5,26 +5,26 @@
  */
 package net.viperfish.chatapplication.core;
 
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.Serializable;
+
 
 /**
  *
  * @author sdai
  */
-public interface LSResponse {
+public interface LSStatus extends Serializable {
+    public static final int SUCCESS = 200;
+    public static final int LOGIN_FAIL = 201;
+    public static final int NO_HANDLER=202;
+    public static final int USER_OFFLINE = 203;
     
     public void setStatus(int status);
     
     public void setStatus(int status, String reason);
     
-    public OutputStream getOutputStream();
+    public int getStatus();
     
-    public Writer getWriter();
-    
-    public void addAttribute(String key, String attr);
-    
-    public void reset();
+    public String getReason();
     
     
 }

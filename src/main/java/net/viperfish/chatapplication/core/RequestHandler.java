@@ -13,5 +13,5 @@ public interface RequestHandler {
 
     public void init();
 
-    public void handleRequest(LSRequest req, LSResponse resp);
+    public LSStatus handleRequest(LSRequest req, LSPayload resp);
 }

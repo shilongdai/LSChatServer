@@ -9,6 +9,6 @@ package net.viperfish.chatapplication.core;
  *
  * @author sdai
  */
-public interface UserDatabase extends CRUDDatabase<Long, User> {
+public interface UserDatabase extends CRUDDatabase<String, User> {
 
 }

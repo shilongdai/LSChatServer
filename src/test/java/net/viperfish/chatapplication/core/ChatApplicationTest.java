@@ -5,12 +5,16 @@
  */
 package net.viperfish.chatapplication.core;
 
-import net.viperfish.chatapplication.userdb.RAMUserDatabase;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import net.viperfish.chatapplication.ChatApplication;
+import net.viperfish.chatapplication.handlers.LoginHandler;
+import net.viperfish.chatapplication.handlers.MessagingHandler;
+import net.viperfish.chatapplication.userdb.RAMUserDatabase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,81 +28,104 @@ public class ChatApplicationTest {
     private static ChatApplication toTest;
     private static JsonGenerator generator;
     private static UserDatabase userDB;
+    private static UserRegister reg;
 
     @BeforeClass
     public static void setup() {
         toTest = new ChatApplication();
         generator = new JsonGenerator();
         userDB = new RAMUserDatabase();
+        reg = new UserRegister();
         User testUser = new User("testUser", "password");
         User testUser1 = new User("testUser1", "password");
         userDB.save(testUser);
         userDB.save(testUser1);
         toTest.setUserDB(userDB);
+        toTest.setSocketMapper(reg);
+        toTest.addHandler(1L, new LoginHandler(userDB, reg));
+        toTest.addHandler(2L, new MessagingHandler());
     }
 
     @Test
     public void testLoginSuccess() throws JsonGenerationException, JsonMappingException, JsonParseException {
+        reg.clear();
         MockWebSocket socket = new MockWebSocket();
+        ChatWebSocket chatSocket = new ChatWebSocket(socket, null);
         DefaultLSRequest request = new DefaultLSRequest();
         request.setType(1L);
         request.setTimeStamp(new Date());
-        request.setTarget("server");
         request.setSource("testUser");
         request.setData("password");
         String packet = generator.toJson(request);
-        toTest.onMessage(socket, packet);
+        toTest.onMessage(chatSocket, packet);
 
-        DefaultLSResponse resp = generator.fromJson(DefaultLSResponse.class, socket.getSentData().get(0));
-        Assert.assertEquals(200L, resp.getStatus());
+        
+        Assert.assertEquals(1, socket.getSentData().size());
+        Assert.assertEquals("testUser", chatSocket.getUser());
+        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, socket.getSentData().get(0));
+        Assert.assertEquals(LSStatus.SUCCESS, resp.getStatus());
+        Assert.assertNotEquals(null, reg.getSocket("testUser"));
     }
 
     @Test
     public void testLoginFail() throws JsonGenerationException, JsonMappingException, JsonParseException {
+        reg.clear();
         MockWebSocket socket = new MockWebSocket();
+        ChatWebSocket chatSocket = new ChatWebSocket(socket, null);
         DefaultLSRequest request = new DefaultLSRequest();
         request.setType(1L);
         request.setTimeStamp(new Date());
-        request.setTarget("server");
         request.setSource("testUser");
         request.setData("fail");
         String packet = generator.toJson(request);
-        toTest.onMessage(socket, packet);
+        toTest.onMessage(chatSocket, packet);
 
-        DefaultLSResponse resp = generator.fromJson(DefaultLSResponse.class, socket.getSentData().get(0));
-        Assert.assertEquals(201L, resp.getStatus());
+        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, socket.getSentData().get(0));
+        Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
+        Assert.assertEquals(null, chatSocket.getUser());
     }
 
     @Test
-    public void testMessage() throws JsonGenerationException, JsonMappingException {
+    public void testMessage() throws JsonGenerationException, JsonMappingException, JsonParseException {
+        reg.clear();
         MockWebSocket socket = new MockWebSocket();
-        DefaultLSRequest request = new DefaultLSRequest();
-        request.setType(1L);
-        request.setTimeStamp(new Date());
-        request.setTarget("server");
-        request.setSource("testUser");
-        request.setData("password");
-        String packet = generator.toJson(request);
-        toTest.onMessage(socket, packet);
-
         MockWebSocket socket1 = new MockWebSocket();
-        DefaultLSRequest request1 = new DefaultLSRequest();
-        request.setType(1L);
-        request.setTimeStamp(new Date());
-        request.setTarget("server");
-        request.setSource("testUser1");
-        request.setData("password");
-        String packet1 = generator.toJson(request1);
-        toTest.onMessage(socket1, packet1);
-
+        reg.register("testUser", socket);
+        reg.register("testUser1", socket1);
         DefaultLSRequest message = new DefaultLSRequest();
         message.setData("testMessage");
         message.setType(2L);
         message.setTimeStamp(new Date());
-        message.setTarget("testUser");
+        message.getAttributes().put("target", "testUser");
         message.setSource("testUser1");
         String messagePacket = generator.toJson(message);
         toTest.onMessage(socket1, messagePacket);
+        
+        Assert.assertEquals(1, socket1.getSentData().size());
+        DefaultLSStatus status = generator.fromJson(DefaultLSStatus.class, socket1.getSentData().get(0));
+        Assert.assertEquals(200, status.getStatus());
+        
+        Assert.assertEquals(1, socket.getSentData().size());
+        DefaultLSPayload received = generator.fromJson(DefaultLSPayload.class, socket.getSentData().get(0));
+        Assert.assertEquals("testMessage", received.getData());
+        Assert.assertEquals("testUser", received.getTarget());
+        Assert.assertEquals("testUser1", received.getSource());
+    }
+    
+    @Test
+    public void testMessageTargetNotFound() throws JsonGenerationException, JsonMappingException, JsonParseException {
+        reg.clear();
+        MockWebSocket socketSource = new MockWebSocket();
+        reg.register("source",socketSource);
+        Map<String, String> attrs = new HashMap<>();
+        attrs.put("target", "dne");
+        LSRequest req = new DefaultLSRequest("source",attrs , new Date(), 2L, "irrelevent", socketSource);
+        
+        toTest.onMessage(socketSource, generator.toJson(req));
+        
+        LSStatus status = generator.fromJson(DefaultLSStatus.class, socketSource.getSentData().get(0));
+        Assert.assertEquals(LSStatus.USER_OFFLINE, status.getStatus());
+        
     }
 
 }
