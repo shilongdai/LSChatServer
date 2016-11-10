@@ -22,6 +22,7 @@ public class DefaultLSPayload implements LSPayload, Serializable {
     private String data;
     private Map<String, String> attr;
     private Date timestamp;
+    private int type;
 
     public DefaultLSPayload() {
         attr = new HashMap<>();
@@ -79,14 +80,24 @@ public class DefaultLSPayload implements LSPayload, Serializable {
         this.timestamp = timestamp;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 79 * hash + Objects.hashCode(this.source);
-        hash = 79 * hash + Objects.hashCode(this.target);
-        hash = 79 * hash + Objects.hashCode(this.data);
-        hash = 79 * hash + Objects.hashCode(this.attr);
-        hash = 79 * hash + Objects.hashCode(this.timestamp);
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.source);
+        hash = 53 * hash + Objects.hashCode(this.target);
+        hash = 53 * hash + Objects.hashCode(this.data);
+        hash = 53 * hash + Objects.hashCode(this.attr);
+        hash = 53 * hash + Objects.hashCode(this.timestamp);
+        hash = 53 * hash + this.type;
         return hash;
     }
 
@@ -102,6 +113,9 @@ public class DefaultLSPayload implements LSPayload, Serializable {
             return false;
         }
         final DefaultLSPayload other = (DefaultLSPayload) obj;
+        if (this.type != other.type) {
+            return false;
+        }
         if (!Objects.equals(this.source, other.source)) {
             return false;
         }
@@ -119,7 +133,7 @@ public class DefaultLSPayload implements LSPayload, Serializable {
         }
         return true;
     }
-    
+
     
     
 }

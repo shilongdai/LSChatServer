@@ -58,11 +58,16 @@ public class ChatApplicationTest {
         request.setData("password");
         String packet = generator.toJson(request);
         toTest.onMessage(chatSocket, packet);
-
         
         Assert.assertEquals(1, socket.getSentData().size());
         Assert.assertEquals("testUser", chatSocket.getUser());
-        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, socket.getSentData().get(0));
+        
+        DefaultLSPayload payload = generator.fromJson(DefaultLSPayload.class, socket.getSentData().get(0));
+        Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
+        Assert.assertEquals(null, payload.getSource());
+        Assert.assertEquals("testUser", payload.getTarget());
+        
+        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, payload.getData());
         Assert.assertEquals(LSStatus.SUCCESS, resp.getStatus());
         Assert.assertNotEquals(null, reg.getSocket("testUser"));
     }
@@ -80,7 +85,12 @@ public class ChatApplicationTest {
         String packet = generator.toJson(request);
         toTest.onMessage(chatSocket, packet);
 
-        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, socket.getSentData().get(0));
+        DefaultLSPayload payload = generator.fromJson(DefaultLSPayload.class, socket.getSentData().get(0));
+        Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
+        Assert.assertEquals(null, payload.getSource());
+        Assert.assertEquals(null, payload.getTarget());
+        
+        DefaultLSStatus resp = generator.fromJson(DefaultLSStatus.class, payload.getData());
         Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
         Assert.assertEquals(null, chatSocket.getUser());
     }
@@ -102,8 +112,12 @@ public class ChatApplicationTest {
         toTest.onMessage(socket1, messagePacket);
         
         Assert.assertEquals(1, socket1.getSentData().size());
-        DefaultLSStatus status = generator.fromJson(DefaultLSStatus.class, socket1.getSentData().get(0));
-        Assert.assertEquals(200, status.getStatus());
+        DefaultLSPayload payload = generator.fromJson(DefaultLSPayload.class, socket1.getSentData().get(0));
+        Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
+        Assert.assertEquals(null, payload.getSource());
+        Assert.assertEquals("testUser1", payload.getTarget());
+        DefaultLSStatus status = generator.fromJson(DefaultLSStatus.class, payload.getData());
+        Assert.assertEquals(LSStatus.SUCCESS, status.getStatus());
         
         Assert.assertEquals(1, socket.getSentData().size());
         DefaultLSPayload received = generator.fromJson(DefaultLSPayload.class, socket.getSentData().get(0));
@@ -123,7 +137,11 @@ public class ChatApplicationTest {
         
         toTest.onMessage(socketSource, generator.toJson(req));
         
-        LSStatus status = generator.fromJson(DefaultLSStatus.class, socketSource.getSentData().get(0));
+        DefaultLSPayload payload = generator.fromJson(DefaultLSPayload.class, socketSource.getSentData().get(0));
+        Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
+        Assert.assertEquals(null, payload.getSource());
+        Assert.assertEquals("source", payload.getTarget());
+        DefaultLSStatus status = generator.fromJson(DefaultLSStatus.class, payload.getData());
         Assert.assertEquals(LSStatus.USER_OFFLINE, status.getStatus());
         
     }

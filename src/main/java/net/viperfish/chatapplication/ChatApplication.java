@@ -15,6 +15,7 @@ import net.viperfish.chatapplication.core.DefaultLSPayload;
 import net.viperfish.chatapplication.core.DefaultLSRequest;
 import net.viperfish.chatapplication.core.DefaultLSStatus;
 import net.viperfish.chatapplication.core.JsonGenerator;
+import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.UserDatabase;
@@ -99,7 +100,17 @@ public class ChatApplication extends WebSocketApplication {
             } else {
                 status.setStatus(LSStatus.NO_HANDLER);
             }
-            socket.send(generator.toJson(status));
+            DefaultLSPayload statusPayload = new DefaultLSPayload();
+            statusPayload.setSource(null);
+            if(socketMapper.getSocket(req.getSource()) != null) {
+                statusPayload.setTarget(req.getSource());
+            } else {
+                statusPayload.setTarget(null);
+            }
+            statusPayload.setData(generator.toJson(status));
+            statusPayload.setSource(null);
+            statusPayload.setType(LSPayload.LS_STATUS);
+            socket.send(generator.toJson(statusPayload));
 
         } catch (JsonParseException | JsonMappingException | JsonGenerationException ex) {
             throw new RuntimeException(ex);

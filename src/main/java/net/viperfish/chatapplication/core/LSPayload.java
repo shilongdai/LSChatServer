@@ -10,6 +10,11 @@ package net.viperfish.chatapplication.core;
  * @author sdai
  */
 public interface LSPayload {
+    
+    public static final int LS_STATUS=1;
+    public static final int LS_MESSAGE=2;
+    
+    public void setType(int type);
     public void setSource(String source);
     public void setTarget(String target);
     public void setAttribute(String attrName, String attr);
