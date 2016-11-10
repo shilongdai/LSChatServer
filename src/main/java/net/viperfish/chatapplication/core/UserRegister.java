@@ -13,7 +13,7 @@ import org.glassfish.grizzly.websockets.WebSocket;
  *
  * @author sdai
  */
-public class UserRegister implements UserSocketMapper, UserSocketRegister {
+public class UserRegister {
 
     private Map<String, WebSocket> mapping;
 
@@ -23,12 +23,10 @@ public class UserRegister implements UserSocketMapper, UserSocketRegister {
     
     
     
-    @Override
     public WebSocket getSocket(String username) {
         return mapping.get(username);
     }
 
-    @Override
     public void register(String username, WebSocket socket) {
         mapping.put(username, socket);
     }

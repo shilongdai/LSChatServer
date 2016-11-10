@@ -13,7 +13,7 @@ import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
-import net.viperfish.chatapplication.core.UserSocketRegister;
+import net.viperfish.chatapplication.core.UserRegister;
 
 /**
  *
@@ -22,9 +22,9 @@ import net.viperfish.chatapplication.core.UserSocketRegister;
 public final class LoginHandler implements RequestHandler {
 
     private UserDatabase userDB;
-    private UserSocketRegister reg;
+    private UserRegister reg;
 
-    public LoginHandler(UserDatabase userDB, UserSocketRegister reg) {
+    public LoginHandler(UserDatabase userDB, UserRegister reg) {
         this.userDB = userDB;
         this.reg = reg;
     }
