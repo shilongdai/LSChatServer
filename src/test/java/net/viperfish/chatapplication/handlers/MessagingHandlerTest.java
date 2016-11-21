@@ -7,8 +7,8 @@ package net.viperfish.chatapplication.handlers;
 
 import java.util.Date;
 import java.util.HashMap;
-import net.viperfish.chatapplication.core.DefaultLSPayload;
-import net.viperfish.chatapplication.core.DefaultLSRequest;
+import net.viperfish.chatapplication.core.LSPayload;
+import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.MockWebSocket;
 import org.junit.Assert;
@@ -23,8 +23,8 @@ public class MessagingHandlerTest {
     @Test
     public void testMessageHandler() {
         MessagingHandler handler = new MessagingHandler();
-        DefaultLSRequest req= new DefaultLSRequest("test", new HashMap<>(), new Date(), 2L, "testMessage", new MockWebSocket());
-        DefaultLSPayload payload = new DefaultLSPayload();
+        LSRequest req= new LSRequest("test", new HashMap<>(), new Date(), 2L, "testMessage", new MockWebSocket());
+        LSPayload payload = new LSPayload();
         req.getAttributes().put("target", "other");
         LSStatus status = handler.handleRequest(req, payload);
         

@@ -10,22 +10,19 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.HashMap;
 import java.util.Map;
-import net.viperfish.chatapplication.core.ChatWebSocket;
-import net.viperfish.chatapplication.core.DefaultLSPayload;
-import net.viperfish.chatapplication.core.DefaultLSRequest;
-import net.viperfish.chatapplication.core.DefaultLSStatus;
+import net.viperfish.chatapplication.core.LSPayload;
+import net.viperfish.chatapplication.core.LSRequest;
+import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
-import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
-import org.glassfish.grizzly.http.HttpRequestPacket;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.websockets.DataFrame;
-import org.glassfish.grizzly.websockets.ProtocolHandler;
 import org.glassfish.grizzly.websockets.WebSocket;
 import org.glassfish.grizzly.websockets.WebSocketApplication;
-import org.glassfish.grizzly.websockets.WebSocketListener;
 
 /**
  *
@@ -33,18 +30,15 @@ import org.glassfish.grizzly.websockets.WebSocketListener;
  */
 public class ChatApplication extends WebSocketApplication {
 
-    private UserDatabase userDB;
     private final Map<Long, RequestHandler> handlerMapper;
     private final JsonGenerator generator;
-    private  UserRegister socketMapper;
+    private UserRegister socketMapper;
+    private final Logger logger;
 
     public ChatApplication() {
         handlerMapper = new HashMap<>();
         generator = new JsonGenerator();
-    }
-
-    public void setUserDB(UserDatabase userDB) {
-        this.userDB = userDB;
+        logger = LogManager.getLogger();
     }
 
     public void setSocketMapper(UserRegister mapper) {
@@ -56,67 +50,63 @@ public class ChatApplication extends WebSocketApplication {
     }
 
     @Override
-    public WebSocket createSocket(ProtocolHandler handler, HttpRequestPacket requestPacket, WebSocketListener... listeners) {
-        return new ChatWebSocket(super.createSocket(handler, requestPacket, listeners), null);
-    }
-
-    @Override
-    public void onClose(WebSocket socket, DataFrame frame) {
-        if(socket instanceof ChatWebSocket) {
-            ChatWebSocket chatSocket = (ChatWebSocket) socket;
-            if(chatSocket.getUser() != null) {
-                socketMapper.unregister(chatSocket.getUser());
-            }
-        } else {
-            throw new AssertionError("Websocket not Chatsocket");
-        }
-        super.onClose(socket, frame);
-    }
-
-    
-    
-    @Override
     public void onMessage(WebSocket socket, String text) {
+        logger.info("Received Message:" + text);
+        LSStatus status = new LSStatus();
+        LSPayload statusPayload = new LSPayload();
+        statusPayload.setSource(null);
         try {
-            DefaultLSRequest req = generator.fromJson(DefaultLSRequest.class, text);
+            LSRequest req = generator.fromJson(LSRequest.class, text);
             req.setSocket(socket);
             if (req.getType() == null) {
-                throw new RuntimeException();
+                logger.warn("Invalid Message:" + text);
+                return;
             }
 
             RequestHandler handler = handlerMapper.get(req.getType());
-            DefaultLSPayload payload = new DefaultLSPayload();
-            LSStatus status = new DefaultLSStatus();
+            LSPayload payload = new LSPayload();
+            status = new LSStatus();
             if (handler != null) {
                 status = handler.handleRequest(req, payload);
                 if (payload.getTarget() != null) {
                     WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
                     if (targetSocket == null || !targetSocket.isConnected()) {
-                        status.setStatus(LSStatus.USER_OFFLINE);
+                        status.setStatus(LSStatus.USER_OFFLINE, "Target User Offline");
                     } else {
                         targetSocket.send(generator.toJson(payload));
                     }
                 }
             } else {
-                status.setStatus(LSStatus.NO_HANDLER);
+                logger.info("No Handler Present For Message Type:" + req.getType());
+                status.setStatus(LSStatus.NO_HANDLER, "No Handler Found For Type" + req.getType());
             }
-            DefaultLSPayload statusPayload = new DefaultLSPayload();
-            statusPayload.setSource(null);
-            if(socketMapper.getSocket(req.getSource()) != null) {
+
+            if (socketMapper.getSocket(req.getSource()) != null) {
                 statusPayload.setTarget(req.getSource());
             } else {
                 statusPayload.setTarget(null);
             }
-            statusPayload.setData(generator.toJson(status));
-            statusPayload.setSource(null);
-            statusPayload.setType(LSPayload.LS_STATUS);
-            socket.send(generator.toJson(statusPayload));
-
         } catch (JsonParseException | JsonMappingException | JsonGenerationException ex) {
-            throw new RuntimeException(ex);
+            logger.warn("Exception Caught:" + ex);
+            status.setStatus(LSStatus.INTERNAL_ERROR, "JSON Processing Error ");
+
+        } finally {
+            try {
+                statusPayload.setData(generator.toJson(status));
+                statusPayload.setSource(null);
+                statusPayload.setType(LSPayload.LS_STATUS);
+                socket.send(generator.toJson(statusPayload));
+            } catch (JsonGenerationException | JsonMappingException ex) {
+                logger.warn("Exception Caught While sending status", ex);
+            }
         }
     }
-    
-    
+
+    @Override
+    public void onClose(WebSocket socket, DataFrame frame) {
+        logger.info("Closing Socket");
+        socketMapper.unregister(socket);
+        super.onClose(socket, frame);
+    }
 
 }

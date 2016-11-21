@@ -7,9 +7,8 @@ package net.viperfish.chatapplication.handlers;
 
 import java.util.Date;
 import java.util.HashMap;
-import net.viperfish.chatapplication.core.ChatWebSocket;
-import net.viperfish.chatapplication.core.DefaultLSPayload;
-import net.viperfish.chatapplication.core.DefaultLSRequest;
+import net.viperfish.chatapplication.core.LSPayload;
+import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
@@ -18,6 +17,7 @@ import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
 import net.viperfish.chatapplication.userdb.RAMUserDatabase;
+import org.glassfish.grizzly.websockets.WebSocket;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,13 +41,12 @@ public class LoginHandlerTest {
     @Test
     public void testLoginHandlerSuccess() {
         register.unregister("sample");
-        ChatWebSocket chatSocket = new ChatWebSocket(new MockWebSocket(), null);
+        WebSocket socket = new MockWebSocket();
         LoginHandler handler = new LoginHandler(userDB, register);
-        LSRequest req = new DefaultLSRequest("sample", new HashMap<>(), new Date(), 1L, "password", chatSocket);
-        LSPayload payload = new DefaultLSPayload();
+        LSRequest req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, "password", socket);
+        LSPayload payload = new LSPayload();
         LSStatus resp = handler.handleRequest(req, payload);
 
-        Assert.assertEquals("sample", chatSocket.getUser());
         Assert.assertEquals(LSStatus.SUCCESS, resp.getStatus());
         Assert.assertNotEquals(null, register.getSocket("sample"));
         
@@ -58,21 +57,19 @@ public class LoginHandlerTest {
         register.unregister("sample");
         LoginHandler handler = new LoginHandler(userDB, register);
         LSRequest req;
-        ChatWebSocket socket = new ChatWebSocket(new MockWebSocket(), null);
-        req = new DefaultLSRequest("noexist", new HashMap<>(), new Date(), 1L, "null", socket);
-        LSPayload payload = new DefaultLSPayload();
+        WebSocket socket = new MockWebSocket();
+        req = new LSRequest("noexist", new HashMap<>(), new Date(), 1L, "null", socket);
+        LSPayload payload = new LSPayload();
         LSStatus resp = handler.handleRequest(req, payload);
         
         Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
         Assert.assertEquals(null, register.getSocket("noexist"));
-        Assert.assertEquals(null, socket.getUser());
         
-        socket = new ChatWebSocket(new MockWebSocket(), null);
-        req = new DefaultLSRequest("sample", new HashMap<>(), new Date(), 1L, "null", socket);
-        payload = new DefaultLSPayload();
+        socket = new MockWebSocket();
+        req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, "null", socket);
+        payload = new LSPayload();
         resp = handler.handleRequest(req, payload);
         
-        Assert.assertEquals(null, socket.getUser());
         Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
         Assert.assertEquals(null, register.getSocket("sample"));
     }

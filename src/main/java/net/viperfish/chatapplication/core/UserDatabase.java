@@ -5,10 +5,12 @@
  */
 package net.viperfish.chatapplication.core;
 
+import org.springframework.data.repository.CrudRepository;
+
 /**
  *
  * @author sdai
  */
-public interface UserDatabase extends CRUDDatabase<String, User> {
-
+public interface UserDatabase extends CrudRepository<User, Long> {
+    public User findByUsername(String username);
 }

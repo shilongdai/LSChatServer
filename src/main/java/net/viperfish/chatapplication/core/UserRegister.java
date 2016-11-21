@@ -7,6 +7,8 @@ package net.viperfish.chatapplication.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.websockets.WebSocket;
 
 /**
@@ -16,9 +18,13 @@ import org.glassfish.grizzly.websockets.WebSocket;
 public class UserRegister {
 
     private Map<String, WebSocket> mapping;
+    private Map<WebSocket, String> reverseMapping;
+    private Logger logger;
 
     public UserRegister() {
         mapping = new HashMap<>();
+        reverseMapping = new HashMap<>();
+        logger = LogManager.getLogger();
     }
     
     
@@ -29,14 +35,26 @@ public class UserRegister {
 
     public void register(String username, WebSocket socket) {
         mapping.put(username, socket);
+        reverseMapping.put(socket, username);
+        logger.info("Registering Socket for:" + username);
     }
     
     
     public void unregister(String username) {
         mapping.remove(username);
+        logger.info("Unregistering Socket for " + username);
+    }
+    
+    public void unregister(WebSocket socket) {
+        if(reverseMapping.containsKey(socket)) {
+            logger.info("Unregistering Socket for " + reverseMapping.get(socket));
+            mapping.remove(reverseMapping.get(socket));
+            reverseMapping.remove(socket);
+        }
     }
     
     public void clear() {
         mapping.clear();
+        reverseMapping.clear();
     }
 }

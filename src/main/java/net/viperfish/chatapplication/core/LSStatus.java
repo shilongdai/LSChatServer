@@ -7,24 +7,49 @@ package net.viperfish.chatapplication.core;
 
 import java.io.Serializable;
 
-
 /**
  *
  * @author sdai
  */
-public interface LSStatus extends Serializable {
+public class LSStatus implements Serializable {
+
     public static final int SUCCESS = 200;
     public static final int LOGIN_FAIL = 201;
     public static final int NO_HANDLER=202;
     public static final int USER_OFFLINE = 203;
+    public static final int INTERNAL_ERROR = 204;
     
-    public void setStatus(int status);
+    private int status;
     
-    public void setStatus(int status, String reason);
+    private String reason;
+
+    public LSStatus(int status, String reason) {
+        this.status = status;
+        this.reason = reason;
+    }
     
-    public int getStatus();
     
-    public String getReason();
+    public LSStatus() {
+        status = 200;
+        this.reason = "Success";
+    }
     
+    public int getStatus() {
+        return status;
+    }
+    
+    public String getReason() {
+        return reason;
+    }
+    
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public void setStatus(int status, String reason) {
+        this.status = status;
+        this.reason = reason;
+    }
+
     
 }

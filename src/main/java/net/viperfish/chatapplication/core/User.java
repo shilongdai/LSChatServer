@@ -5,13 +5,22 @@
  */
 package net.viperfish.chatapplication.core;
 
+import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author sdai
  */
-public final class User {
+@Entity
+@Table
+public class User implements Serializable{
 
     private String username;
     private String credential;
@@ -28,6 +37,7 @@ public final class User {
         this.credential = credential;
     }
 
+    @Basic
     public String getUsername() {
         return username;
     }
@@ -36,6 +46,7 @@ public final class User {
         this.username = username;
     }
 
+    @Basic
     public String getCredential() {
         return credential;
     }
@@ -44,6 +55,8 @@ public final class User {
         this.credential = credential;
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
