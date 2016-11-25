@@ -5,7 +5,13 @@
  */
 package net.viperfish.chatapplication.handlers;
 
-import net.viperfish.chatapplication.core.LSStatus;
+import java.nio.ByteBuffer;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
@@ -13,6 +19,10 @@ import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.util.Base64Utils;
+import sun.security.ec.ECPublicKeyImpl;
 
 /**
  *
@@ -20,12 +30,14 @@ import net.viperfish.chatapplication.core.UserRegister;
  */
 public final class LoginHandler implements RequestHandler {
 
-    private UserDatabase userDB;
-    private UserRegister reg;
+    private final UserDatabase userDB;
+    private final UserRegister reg;
+    private final Logger logger;
 
     public LoginHandler(UserDatabase userDB, UserRegister reg) {
         this.userDB = userDB;
         this.reg = reg;
+        logger = LogManager.getLogger();
     }
 
     @Override
@@ -40,16 +52,53 @@ public final class LoginHandler implements RequestHandler {
             status.setStatus(LSStatus.LOGIN_FAIL, "User" + req.getSource() + " not found");
             return status;
         }
-
+        
+        if(req.getSession().getAttribute("imposedChallenge", String.class) == null) {
+            status.setStatus(LSStatus.CHALLENGE);
+            SecureRandom rand = new SecureRandom();
+            long chg = 0;
+            while(chg == 0) {
+                chg = rand.nextLong();
+            }
+            status.setAdditional(Long.toString(chg));
+            req.getSession().setAttribute("imposedChallenge", Long.toString(chg));
+            return status;
+        }
         String suppliedCredential = req.getData();
-        if (suppliedCredential.equals(u.getCredential())) {
-            status.setStatus(LSStatus.SUCCESS);
-            reg.register(u.getUsername(), req.getSocket());
-
-        } else {
-            status.setStatus(LSStatus.LOGIN_FAIL, "Username or password incorrect");
+        PublicKey userKey = null;
+        try {
+            userKey = new ECPublicKeyImpl(Base64Utils.decodeFromString(u.getCredential()));
+        } catch (InvalidKeyException ex) {
+            logger.warn("Invalid Key", ex);
+            status.setStatus(LSStatus.INTERNAL_ERROR, "Invalid Public Key");
+            return status;
+        }
+        try {
+            if (this.verifyLogin(req.getSession().getAttribute("imposedChallenge", String.class), suppliedCredential, userKey)) {
+                status.setStatus(LSStatus.SUCCESS);
+                reg.register(u.getUsername(), req.getSocket());
+                req.getSession().setAttribute("publicKey", userKey);
+            } else {
+                status.setStatus(LSStatus.LOGIN_FAIL, "Username or password incorrect");
+                return status;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
+            logger.warn("cannot verify signature", ex);
+            status.setStatus(LSStatus.LOGIN_FAIL, "Server Cannot Verify Signature");
+            return status;
         }
         return status;
+    }
+    
+    public boolean verifyLogin(String correctChallenge, String signature, PublicKey pub) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        long incremented = Long.parseLong(correctChallenge)+1;
+        
+        byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(incremented).array();
+        Signature sig = Signature.getInstance("SHA256withECDSA");
+        sig.initVerify(pub);
+        sig.update(data);
+        
+        return sig.verify(Base64Utils.decodeFromString(signature));
     }
 
 }

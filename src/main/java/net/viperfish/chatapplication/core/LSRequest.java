@@ -33,7 +33,8 @@ public class LSRequest implements Serializable {
     private Long type;
     private String data;
     private transient WebSocket socket;
-
+    private transient LSSession session;
+    
     public LSRequest(String from, Map<String, String> attributes, Date timeStamp, Long type, String data, WebSocket sock) {
         this.source = from;
         this.attributes = attributes;
@@ -127,6 +128,16 @@ public class LSRequest implements Serializable {
         return this.socket;
     }
 
+    
+    @JsonIgnore
+    public LSSession getSession() {
+        return this.session;
+    }
+    
+    public void setSession(LSSession session) {
+        this.session = session;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 5;

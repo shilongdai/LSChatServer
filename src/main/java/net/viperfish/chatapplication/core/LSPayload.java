@@ -17,9 +17,9 @@ import java.util.Objects;
  */
 public class LSPayload implements Serializable {
 
-    public static final int LS_STATUS=1;
-    public static final int LS_MESSAGE=2;
-    
+    public static final int LS_STATUS = 1;
+    public static final int LS_MESSAGE = 2;
+
     private String source;
     private String target;
     private String data;
@@ -32,8 +32,7 @@ public class LSPayload implements Serializable {
         timestamp = new Date();
         this.target = null;
     }
-    
-    
+
     public void setSource(String source) {
         this.source = source;
     }
@@ -41,7 +40,6 @@ public class LSPayload implements Serializable {
     public void setTarget(String target) {
         this.target = target;
     }
-
 
     public void setAttribute(String attrName, String attr) {
         this.attr.put(attrName, attr);
@@ -132,6 +130,4 @@ public class LSPayload implements Serializable {
         return true;
     }
 
-    
-    
 }

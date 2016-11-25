@@ -10,11 +10,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.HashMap;
 import java.util.Map;
-import net.viperfish.chatapplication.core.LSPayload;
-import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
+import net.viperfish.chatapplication.core.LSRequest;
+import net.viperfish.chatapplication.core.LSSession;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -34,11 +34,16 @@ public class ChatApplication extends WebSocketApplication {
     private final JsonGenerator generator;
     private UserRegister socketMapper;
     private final Logger logger;
-
+    private final DefaultFilterChain filterChain;
+    private Map<String, LSSession> sessions;
+    
+    
     public ChatApplication() {
         handlerMapper = new HashMap<>();
+        sessions = new HashMap<>();
         generator = new JsonGenerator();
         logger = LogManager.getLogger();
+        filterChain = new DefaultFilterChain();
     }
 
     public void setSocketMapper(UserRegister mapper) {
@@ -62,12 +67,17 @@ public class ChatApplication extends WebSocketApplication {
                 logger.warn("Invalid Message:" + text);
                 return;
             }
+            if (!sessions.containsKey(req.getSource())) {
+                sessions.put(req.getSource(), new DefaultLSSession(req.getSource()));
+            }
+            req.setSession(sessions.get(req.getSource()));
 
             RequestHandler handler = handlerMapper.get(req.getType());
             LSPayload payload = new LSPayload();
             status = new LSStatus();
             if (handler != null) {
-                status = handler.handleRequest(req, payload);
+                filterChain.setEndpoint(handler);
+                status = filterChain.process(req, payload);
                 if (payload.getTarget() != null) {
                     WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
                     if (targetSocket == null || !targetSocket.isConnected()) {

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
-import net.viperfish.chatapplication.core.MockWebSocket;
+import net.viperfish.chatapplication.MockWebSocket;
 import org.junit.Assert;
 import org.junit.Test;
 

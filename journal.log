@@ -392,3 +392,366 @@
   "type" : 2,
   "data" : "testMessage"
 }
+22:24:44.368 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:24:44.376 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:24:44.376 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
+22:24:44.640 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:54): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1479871484536,
+  "type" : 1,
+  "data" : "password"
+}
+22:24:44.688 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:24:44.706 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:54): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1479871484706,
+  "type" : 1,
+  "data" : "fail"
+}
+22:24:44.707 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:24:44.708 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:54): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1479871484708,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:24:44.710 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:24:44.710 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:24:44.711 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:54): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1479871484711,
+  "type" : 2,
+  "data" : "testMessage"
+}
+17:40:43.327 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480027243253,
+  "type" : 1,
+  "data" : "MGUCMQDkcoFRP93kjvCngh3oPBFmQHEc1H4TE+hfXy8FtIBES8Yn4C/BmvKA0P6mQRpbbgICMBi9pF6UHuSkZ0pAq955oqYh/gmI/1bhxcO7BezeKN9HXvm+LYfq24lGXgMNj16vDQ=="
+}
+17:40:43.398 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+17:40:43.414 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480027243408,
+  "type" : 1,
+  "data" : "MGYCMQD9KLK29ehhGWEfH6bo1Sn07kiA6sGfd47yqL58iN0dHdpZifVAaAsYhIX/E0sgU2YCMQC5qvjKXXz/rJCNEQeyu9w48irJkNU8bzOmWKfl0CbZkNSIsIIyfYXrmZggQEKIi4I="
+}
+17:40:43.422 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+17:40:43.422 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480027243422,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+17:40:43.423 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+17:40:43.424 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+17:40:43.424 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480027243424,
+  "type" : 2,
+  "data" : "testMessage"
+}
+17:40:43.437 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+17:40:43.465 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+17:40:43.480 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
+17:43:40.783 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480027420706,
+  "type" : 1,
+  "data" : "MGUCMQC7fQSAK0OJdZvwLHbpNK8mBB5HX++k2AYWg8XknVuDNkyayYJtVPwzTqr8fPGTQRECMCBiMV+MXRBEFI8ZK2H6v6isFz46aoDjsOcfghusGv5vATG4y0A9mlzTLka7xNttJw=="
+}
+17:43:40.824 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+17:43:40.847 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480027420841,
+  "type" : 1,
+  "data" : "MGUCMAqYIxYpjn2A7RDcLzeXtIeDXSda2cz2gndHYF91B3UZK5NRFYPpt0VaXaL7+PAlVQIxAO+qoUjEaHD6JhFMjC++wdwPnPxkv4v69qpQYvrhHt8dWE8dRh9O/6SlzYf2j28EVw=="
+}
+17:43:40.855 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+17:43:40.856 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480027420856,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+17:43:40.857 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+17:43:40.857 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+17:43:40.858 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480027420858,
+  "type" : 2,
+  "data" : "testMessage"
+}
+17:43:40.872 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+17:43:40.894 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+17:43:40.905 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
+22:13:18.853 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043598776,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:13:18.923 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043598911,
+  "type" : 1,
+  "data" : "MGQCMAPO/GsYq5dzCN6faCLi3ZxhLXqMBn13b13c51g9lOp22itQoKJRE3RvHsvmsT7OLQIwUp4GchFlwkMqTS+JM+ql5K6qwV7S2YzXQofRZPN8IaEB0ID8xYj10K3pts9fEpih"
+}
+22:13:18.925 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:13:18.926 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480043598926,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:13:18.929 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:13:18.930 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:13:18.930 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480043598930,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:13:18.943 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:13:18.952 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:18:13.021 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043892899,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:18:13.120 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043893109,
+  "type" : 1,
+  "data" : "MGYCMQDeF+GsFyiv68DDiLW+QCJr+T9RDrjLlZT3oA3MnYPubnrs0uBACxYe04d4RyTItKMCMQClF3PXQwh6O47ASYWZH+LiVm7mh/nfvN0pFm+qv+w0Y21UgJAXq1jO3MDWEOSe7a8="
+}
+22:18:13.123 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:18:13.124 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480043893123,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:18:13.127 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:18:13.127 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:18:13.128 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480043893127,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:18:13.138 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:18:13.147 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:19:34.228 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043974121,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:19:34.305 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480043974294,
+  "type" : 1,
+  "data" : "MGQCMHOeHN3LhFpjv39uWpd0mSfu9mCnPAcxPGqWFWrMS43wF02jTpe/U6gxcnNLSlw6BwIwa4YCuF9rH9aMT9iz5fRKm8GkddaWYpa/AvZT/otrbMh/yX/+9wVccF/mbPy9N9py"
+}
+22:19:34.307 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:19:34.308 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480043974308,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:19:34.311 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:19:34.312 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:19:34.312 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480043974312,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:19:34.329 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:19:34.337 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:21:21.715 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044081639,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:21:21.774 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044081761,
+  "type" : 1,
+  "data" : "MGUCMBECLmiRCf0VxQIDGIYN0pEjPy3IsAN6rw/8U6zQcIaITSAXEmWFqwEyHFLnBycuXwIxANYkQD4afGqQfH/VVzC3tDqLEpsh+AXruoUmdCfrE/qE3juJ1zb0cJwbfZEBpYz7HQ=="
+}
+22:21:21.777 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:21:21.777 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480044081777,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:21:21.781 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:21:21.782 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:21:21.782 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480044081782,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:21:21.801 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:21:21.811 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:22:49.750 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044169654,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:22:49.819 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044169807,
+  "type" : 1,
+  "data" : "MGUCMGwBEpICmWag8YkejpBifVys9qQGT46uVNWzfAWFE3lZ8uVyXdmSk4xnxu6y1prm0gIxAJaq8FfRi+fdopw37/SrJA4WJ1ej+PvX/rDufc6ey7dislxFlGRhW9pzKivhZ3tdtw=="
+}
+22:22:49.833 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044169807,
+  "type" : 1,
+  "data" : "MGUCMGwBEpICmWag8YkejpBifVys9qQGT46uVNWzfAWFE3lZ8uVyXdmSk4xnxu6y1prm0gIxAJaq8FfRi+fdopw37/SrJA4WJ1ej+PvX/rDufc6ey7dislxFlGRhW9pzKivhZ3tdtw=="
+}
+22:22:49.844 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:22:49.845 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480044169845,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:22:49.846 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:22:49.846 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:22:49.846 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480044169846,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:22:49.865 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:22:49.879 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:22:49.891 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
+22:25:25.814 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044325734,
+  "type" : 1,
+  "data" : "challenge"
+}
+22:25:25.878 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044325869,
+  "type" : 1,
+  "data" : "MGQCMH2g1/c88v6PmuM/wpYRpSVhJN2+/iyO1fH7iroV197pl1v+shYHPVD0ZjxjozDq0QIwNMFPNqfthRMRoNWlT3xMVcvGWZy/WldoEHXEVdkW7mbUk1v02KCNaRzieCyNXhPN"
+}
+22:25:25.886 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:25:25.893 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044325887,
+  "type" : 1,
+  "data" : "MGUCMQCNs2JbzQ2ydObo8jz887IbA925d/BfVuPWx/Si3ZzBMWVGidmHZJ3YJjJu2HVo7FcCMEKb3lQ4dYFVnUvOgkIBkYn2anqBBh57OomMNw34uWx/hsGAKB1r4+bkEyM6iq2n8g=="
+}
+22:25:25.900 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480044325887,
+  "type" : 1,
+  "data" : "MGUCMQCNs2JbzQ2ydObo8jz887IbA925d/BfVuPWx/Si3ZzBMWVGidmHZJ3YJjJu2HVo7FcCMEKb3lQ4dYFVnUvOgkIBkYn2anqBBh57OomMNw34uWx/hsGAKB1r4+bkEyM6iq2n8g=="
+}
+22:25:25.912 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:25:25.913 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480044325913,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:25:25.914 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:25:25.915 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:25:25.915 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480044325915,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:25:25.926 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:25:25.959 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:25:25.984 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
