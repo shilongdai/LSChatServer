@@ -5,6 +5,14 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
@@ -169,12 +177,26 @@ public class ApplicationRootContext implements AsyncConfigurer {
     
 
     @Bean
-    public ChatApplication chatApplication() {
+    public ChatApplication chatApplication() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         ChatApplication application = new ChatApplication();
         application.setSocketMapper(this.userRegister());
-        application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister()));
+        application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister(), this.serverKey().getPrivate()));
         application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
         return application;
     }
 
+    @Bean
+    public KeyPair serverKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] publicKeyBytes = Files.readAllBytes(Paths.get("pubkey.pub"));
+        byte[] privateKeyBytes = Files.readAllBytes(Paths.get("private.key"));
+        PKCS8EncodedKeySpec privateSpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        PrivateKey priv = KeyFactory.getInstance("EC").generatePrivate(privateSpec);
+        
+        X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(publicKeyBytes);
+        PublicKey publicKey = KeyFactory.getInstance("EC").generatePublic(publicSpec);
+        
+        KeyPair result = new KeyPair(publicKey, priv);
+        return result;
+    }
+    
 }

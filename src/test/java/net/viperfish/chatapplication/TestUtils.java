@@ -11,6 +11,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -38,5 +39,21 @@ public final class TestUtils {
         sig.update(data);
         byte[] signature = sig.sign();
         return Base64Utils.encodeToString(signature);
+    }
+    
+    public static String generateChallenge() {
+        SecureRandom rand = new SecureRandom();
+        return Long.toString(rand.nextLong());
+    }
+    
+    public static boolean verifyChallenge(String sent, String signature, PublicKey server) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature sig = Signature.getInstance("SHA256withECDSA");
+        sig.initVerify(server);
+        
+        byte[] sigBytes = Base64Utils.decodeFromString(signature);
+        byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(Long.parseLong(sent) + 1).array();
+        
+        sig.update(data);
+        return sig.verify(sigBytes);
     }
 }

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,12 +43,14 @@ public class ChatApplicationTest {
     private static UserRegister reg;
     private static KeyPair testKey1;
     private static KeyPair testKey2;
+    private static PublicKey serverPub;
 
     @BeforeClass
     public static void setup() throws NoSuchAlgorithmException {
         testKey1 = TestUtils.generateKeyPair();
         testKey2 = TestUtils.generateKeyPair();
-        
+        KeyPair serverKey = TestUtils.generateKeyPair();
+        serverPub = serverKey.getPublic();
         toTest = new ChatApplication();
         generator = new JsonGenerator();
         userDB = new RAMUserDatabase();
@@ -57,7 +60,7 @@ public class ChatApplicationTest {
         userDB.save(testUser);
         userDB.save(testUser1);
         toTest.setSocketMapper(reg);
-        toTest.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDB, reg));
+        toTest.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDB, reg, serverKey.getPrivate()));
         toTest.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
     }
 
@@ -65,11 +68,12 @@ public class ChatApplicationTest {
     public void testLoginSuccess() throws JsonGenerationException, JsonMappingException, JsonParseException, InvalidKeyException, NoSuchAlgorithmException, SignatureException {
         reg.clear();
         MockWebSocket socket = new MockWebSocket();
+        String clientChallenge = TestUtils.generateChallenge();
         LSRequest request = new LSRequest();
         request.setType(1L);
         request.setTimeStamp(new Date());
         request.setSource("testUser");
-        request.setData("challenge");
+        request.setData(clientChallenge);
         String packet = generator.toJson(request);
         toTest.onMessage(socket, packet);
         
@@ -82,11 +86,15 @@ public class ChatApplicationTest {
         
         LSStatus resp = generator.fromJson(LSStatus.class, payload.getData());
         Assert.assertEquals(LSStatus.CHALLENGE, resp.getStatus());
+        String signature = resp.getAdditional().split(";")[1];
+        Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, signature, serverPub));
+        
+        
         request = new LSRequest();
         request.setType(1L);
         request.setTimeStamp(new Date());
         request.setSource("testUser");
-        request.setData(TestUtils.generateCredential(resp.getAdditional(), testKey1.getPrivate()));
+        request.setData(TestUtils.generateCredential(resp.getAdditional().split(";")[0], testKey1.getPrivate()));
         packet = generator.toJson(request);
         toTest.onMessage(socket, packet);
         payload = generator.fromJson(LSPayload.class, socket.getSentData().get(1));

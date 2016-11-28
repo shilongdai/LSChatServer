@@ -38,7 +38,6 @@ public class Bootstrap {
         });
         
         ChatApplication application = rootContext.getBean(ChatApplication.class);
-        
         WebSocketEngine.getEngine().register("", "/messenger", application);
 
         Scanner inputReader = new Scanner(System.in);

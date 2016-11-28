@@ -8,6 +8,7 @@ package net.viperfish.chatapplication.handlers;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
@@ -33,11 +34,13 @@ public final class LoginHandler implements RequestHandler {
     private final UserDatabase userDB;
     private final UserRegister reg;
     private final Logger logger;
+    private PrivateKey priv;
 
-    public LoginHandler(UserDatabase userDB, UserRegister reg) {
+    public LoginHandler(UserDatabase userDB, UserRegister reg, PrivateKey priv) {
         this.userDB = userDB;
         this.reg = reg;
         logger = LogManager.getLogger();
+        this.priv = priv;
     }
 
     @Override
@@ -52,16 +55,25 @@ public final class LoginHandler implements RequestHandler {
             status.setStatus(LSStatus.LOGIN_FAIL, "User" + req.getSource() + " not found");
             return status;
         }
-        
-        if(req.getSession().getAttribute("imposedChallenge", String.class) == null) {
-            status.setStatus(LSStatus.CHALLENGE);
-            SecureRandom rand = new SecureRandom();
-            long chg = 0;
-            while(chg == 0) {
-                chg = rand.nextLong();
+        try {
+            if (req.getSession().getAttribute("imposedChallenge", String.class) == null) {
+
+                status.setStatus(LSStatus.CHALLENGE);
+                SecureRandom rand = new SecureRandom();
+                long chg = 0;
+                while (chg == 0) {
+                    chg = rand.nextLong();
+                }
+
+                String challengeResponse = this.generateCredential(req.getData(), priv);
+                status.setAdditional(Long.toString(chg) + ";" + challengeResponse);
+                req.getSession().setAttribute("imposedChallenge", Long.toString(chg));
+                return status;
+
             }
-            status.setAdditional(Long.toString(chg));
-            req.getSession().setAttribute("imposedChallenge", Long.toString(chg));
+        } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException ex) {
+            this.logger.warn("cannot generate credential", ex);
+            status.setStatus(LSStatus.INTERNAL_ERROR);
             return status;
         }
         String suppliedCredential = req.getData();
@@ -89,16 +101,28 @@ public final class LoginHandler implements RequestHandler {
         }
         return status;
     }
-    
+
     public boolean verifyLogin(String correctChallenge, String signature, PublicKey pub) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        long incremented = Long.parseLong(correctChallenge)+1;
-        
+        long incremented = Long.parseLong(correctChallenge) + 1;
+
         byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(incremented).array();
         Signature sig = Signature.getInstance("SHA256withECDSA");
         sig.initVerify(pub);
         sig.update(data);
-        
+
         return sig.verify(Base64Utils.decodeFromString(signature));
+    }
+
+    public String generateCredential(String info, PrivateKey key) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+        Signature sig = Signature.getInstance("SHA256withECDSA");
+        sig.initSign(key);
+
+        long response = Long.parseLong(info) + 1;
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        byte[] data = buffer.putLong(response).array();
+        sig.update(data);
+        byte[] signature = sig.sign();
+        return Base64Utils.encodeToString(signature);
     }
 
 }

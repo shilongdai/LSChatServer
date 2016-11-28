@@ -755,3 +755,56 @@
 22:25:25.926 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
 22:25:25.959 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
 22:25:25.984 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
+22:31:33.962 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480303893885,
+  "type" : 1,
+  "data" : "5706819034870711330"
+}
+22:31:34.096 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480303894093,
+  "type" : 1,
+  "data" : "MGUCMA2fGt5H0f/4cZiIgpgVFArwAQDBQdJtXtpqGi8nj2wh6fU7S+u8m/hEWHsPEPFjPwIxAPZZqKpz9XPZnlf4LW4CAmJcpV3/R36RR+WaBK8NerDYuGv2RQWTAYFwlITAAIlGRw=="
+}
+22:31:34.104 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:31:34.111 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480303894106,
+  "type" : 1,
+  "data" : "MGUCMGvMUg0C5oywzdD5N1QW2KfTA4hU1EseSJeLzCV/B5NmA+fSll51RvZMt4fHa/sJdgIxAKP9AuJJnRFUJabix7YtV1of4S4k4vxIsUBxwVlGlaD4dtOqMS2BGR26vl4WKoXGeg=="
+}
+22:31:34.119 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser",
+  "attributes" : { },
+  "timeStamp" : 1480303894106,
+  "type" : 1,
+  "data" : "MGUCMGvMUg0C5oywzdD5N1QW2KfTA4hU1EseSJeLzCV/B5NmA+fSll51RvZMt4fHa/sJdgIxAKP9AuJJnRFUJabix7YtV1of4S4k4vxIsUBxwVlGlaD4dtOqMS2BGR26vl4WKoXGeg=="
+}
+22:31:34.128 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:source
+22:31:34.128 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "source",
+  "attributes" : {
+    "target" : "dne"
+  },
+  "timeStamp" : 1480303894128,
+  "type" : 2,
+  "data" : "irrelevent"
+}
+22:31:34.130 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser
+22:31:34.130 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:testUser1
+22:31:34.131 [main]   INFO  net.viperfish.chatapplication.ChatApplication net.viperfish.chatapplication.ChatApplication.onMessage(ChatApplication.java:59): Received Message:{
+  "source" : "testUser1",
+  "attributes" : {
+    "target" : "testUser"
+  },
+  "timeStamp" : 1480303894131,
+  "type" : 2,
+  "data" : "testMessage"
+}
+22:31:34.150 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:31:34.177 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.unregister(UserRegister.java:45): Unregistering Socket for sample
+22:31:34.200 [main]   INFO  net.viperfish.chatapplication.core.UserRegister net.viperfish.chatapplication.core.UserRegister.register(UserRegister.java:39): Registering Socket for:sample
