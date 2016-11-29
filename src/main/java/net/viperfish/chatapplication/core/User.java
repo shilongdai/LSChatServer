@@ -6,6 +6,7 @@
 package net.viperfish.chatapplication.core;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -23,7 +24,7 @@ import javax.persistence.Table;
 public class User implements Serializable{
 
     private String username;
-    private String credential;
+    private byte[] credential;
     private Long id;
 
     public User() {
@@ -32,9 +33,9 @@ public class User implements Serializable{
         id = null;
     }
 
-    public User(String username, String credential) {
+    public User(String username, byte[] credential) {
         this.username = username;
-        this.credential = credential;
+        this.credential = credential.clone();
     }
 
     @Basic
@@ -47,11 +48,11 @@ public class User implements Serializable{
     }
 
     @Basic
-    public String getCredential() {
-        return credential;
+    public byte[] getCredential() {
+        return credential.clone();
     }
 
-    public void setCredential(String credential) {
+    public void setCredential(byte[] credential) {
         this.credential = credential;
     }
 
@@ -68,9 +69,9 @@ public class User implements Serializable{
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.username);
-        hash = 79 * hash + Objects.hashCode(this.credential);
-        hash = 79 * hash + Objects.hashCode(this.id);
+        hash = 17 * hash + Objects.hashCode(this.username);
+        hash = 17 * hash + Arrays.hashCode(this.credential);
+        hash = 17 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -89,7 +90,7 @@ public class User implements Serializable{
         if (!Objects.equals(this.username, other.username)) {
             return false;
         }
-        if (!Objects.equals(this.credential, other.credential)) {
+        if (!Arrays.equals(this.credential, other.credential)) {
             return false;
         }
         if (!Objects.equals(this.id, other.id)) {
@@ -97,5 +98,7 @@ public class User implements Serializable{
         }
         return true;
     }
+
+    
 
 }

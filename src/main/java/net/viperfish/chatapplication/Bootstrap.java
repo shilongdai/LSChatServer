@@ -10,8 +10,6 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.viperfish.chatapplication.core.User;
-import net.viperfish.chatapplication.core.UserDatabase;
 import org.apache.logging.log4j.ThreadContext;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.websockets.WebSocketAddOn;
@@ -55,14 +53,6 @@ public class Bootstrap {
                 }
                 String[] parts = command.split(" ");
                 switch (parts[0]) {
-                    case "addUser": {
-                        String username = parts[1];
-                        String password = parts[2];
-                        User newUser = new User(username, password);
-                        rootContext.getBean(UserDatabase.class).save(newUser);
-                        System.out.println("User " + username + " added");
-                        break;
-                    }
                     default: {
                         System.out.println("The command " + parts[0] + " is not supported");
                     }

@@ -27,7 +27,6 @@ import org.glassfish.grizzly.websockets.WebSocket;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.util.Base64Utils;
 
 /**
  *
@@ -44,7 +43,7 @@ public class LoginHandlerTest {
     public static void init() throws NoSuchAlgorithmException {
         userDB = new RAMUserDatabase();
         testKey = TestUtils.generateKeyPair();
-        userDB.save(new User("sample", Base64Utils.encodeToString(testKey.getPublic().getEncoded())));
+        userDB.save(new User("sample", testKey.getPublic().getEncoded()));
         register = new UserRegister();
         serverKey = TestUtils.generateKeyPair();
     }

@@ -34,7 +34,7 @@ public final class LoginHandler implements RequestHandler {
     private final UserDatabase userDB;
     private final UserRegister reg;
     private final Logger logger;
-    private PrivateKey priv;
+    private final PrivateKey priv;
 
     public LoginHandler(UserDatabase userDB, UserRegister reg, PrivateKey priv) {
         this.userDB = userDB;
@@ -79,7 +79,7 @@ public final class LoginHandler implements RequestHandler {
         String suppliedCredential = req.getData();
         PublicKey userKey = null;
         try {
-            userKey = new ECPublicKeyImpl(Base64Utils.decodeFromString(u.getCredential()));
+            userKey = new ECPublicKeyImpl(u.getCredential());
         } catch (InvalidKeyException ex) {
             logger.warn("Invalid Key", ex);
             status.setStatus(LSStatus.INTERNAL_ERROR, "Invalid Public Key");

@@ -29,7 +29,6 @@ import net.viperfish.chatapplication.userdb.RAMUserDatabase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.util.Base64Utils;
 
 /**
  *
@@ -55,8 +54,8 @@ public class ChatApplicationTest {
         generator = new JsonGenerator();
         userDB = new RAMUserDatabase();
         reg = new UserRegister();
-        User testUser = new User("testUser", Base64Utils.encodeToString(testKey1.getPublic().getEncoded()));
-        User testUser1 = new User("testUser1", Base64Utils.encodeToString(testKey2.getPublic().getEncoded()));
+        User testUser = new User("testUser", testKey1.getPublic().getEncoded());
+        User testUser1 = new User("testUser1", testKey2.getPublic().getEncoded());
         userDB.save(testUser);
         userDB.save(testUser1);
         toTest.setSocketMapper(reg);
