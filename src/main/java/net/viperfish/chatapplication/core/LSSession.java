@@ -21,4 +21,5 @@ public interface LSSession {
     public void removeAttribute(String name);
     public boolean containsAttribute(String name);
     public void setAttribute(String name, Object attr);
+    public void invalidate();
 }

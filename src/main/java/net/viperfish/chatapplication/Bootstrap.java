@@ -6,10 +6,19 @@
 package net.viperfish.chatapplication;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import net.viperfish.chatapplication.core.KeyUtils;
+import net.viperfish.chatapplication.core.User;
+import net.viperfish.chatapplication.core.UserDatabase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.websockets.WebSocketAddOn;
@@ -23,6 +32,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class Bootstrap {
 
     public static void main(String[] args) {
+        Logger logger = LogManager.getLogger();
         ThreadContext.put("id", UUID.randomUUID().toString());
         ThreadContext.put("username", "journalUser");
         AnnotationConfigApplicationContext rootContext = new AnnotationConfigApplicationContext(
@@ -38,6 +48,7 @@ public class Bootstrap {
         ChatApplication application = rootContext.getBean(ChatApplication.class);
         WebSocketEngine.getEngine().register("", "/messenger", application);
 
+        UserDatabase userDB = rootContext.getBean(UserDatabase.class);
         Scanner inputReader = new Scanner(System.in);
         try {
             server.start();
@@ -53,14 +64,43 @@ public class Bootstrap {
                 }
                 String[] parts = command.split(" ");
                 switch (parts[0]) {
+                    case "createUser": {
+                        if(parts.length != 3) {
+                            System.out.println("createUser <username> <public key url>");
+                            break;
+                        }
+                        try {
+                            URI u = new URI(parts[2]);
+                            PublicKey pubKey = KeyUtils.INSTANCE.readPublicKey(Paths.get(u));
+                            User user = new User();
+                            user.setUsername(parts[1]);
+                            user.setCredential(pubKey.getEncoded());
+                            userDB.save(user);
+                        } catch (URISyntaxException e) {
+                            System.out.println("Invalid Syntax");
+                            break;
+                        } catch (InvalidKeySpecException ex) {
+                            System.out.println("Invalid Key");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("Unable to read file");
+                            break;
+                        }
+                        break;
+                    }
+                    case "clearUser": {
+                        userDB.deleteAll();
+                        break;
+                    }
                     default: {
                         System.out.println("The command " + parts[0] + " is not supported");
                     }
                 }
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Bootstrap.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+        } catch (IOException | NoSuchAlgorithmException ex) {
+            logger.warn("error", ex);
+        } 
+        finally {
             server.shutdown();
         }
 

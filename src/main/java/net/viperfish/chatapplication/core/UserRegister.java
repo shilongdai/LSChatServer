@@ -53,6 +53,10 @@ public class UserRegister {
         }
     }
     
+    public String getUsername(WebSocket socket) {
+        return reverseMapping.get(socket);
+    }
+    
     public void clear() {
         mapping.clear();
         reverseMapping.clear();

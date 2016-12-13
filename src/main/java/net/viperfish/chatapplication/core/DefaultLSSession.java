@@ -17,12 +17,29 @@ import java.util.Set;
 **/
 public class DefaultLSSession implements LSSession {
 
+    private static Map<String, DefaultLSSession> sessions = new HashMap<>();
+    
+    public static DefaultLSSession getSession(String user) {
+        DefaultLSSession session;
+        if(!sessions.containsKey(user)) {
+            session = new DefaultLSSession(user);
+            sessions.put(user, session);
+        } else {
+            session = sessions.get(user);
+        }
+        return session;
+    }
+    
+    public static void clearAllSessions() {
+        sessions.clear();
+    }
+    
     private String user;
     private Map<String, Object> attrs;
     private long creationTime;
     private boolean isNew;
 
-    public DefaultLSSession(String user) {
+    private DefaultLSSession(String user) {
         this.user = user;
         attrs = new HashMap<>();
         creationTime = new Date().getTime();
@@ -82,6 +99,11 @@ public class DefaultLSSession implements LSSession {
     @Override
     public void setAttribute(String name, Object attr) {
         this.attrs.put(name, attr);
+    }
+
+    @Override
+    public void invalidate() {
+        sessions.remove(user);
     }
     
     

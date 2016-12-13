@@ -51,7 +51,7 @@ public class LoginHandlerTest {
     @Test
     public void testLoginHandlerSuccess() throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
         register.unregister("sample");
-        LSSession session = new DefaultLSSession("sample");
+        LSSession session = DefaultLSSession.getSession("sample");
         WebSocket socket = new MockWebSocket();
         LoginHandler handler = new LoginHandler(userDB, register, serverKey.getPrivate());
         String clientChallenge = TestUtils.generateChallenge();
@@ -80,7 +80,7 @@ public class LoginHandlerTest {
         LoginHandler handler = new LoginHandler(userDB, register, serverKey.getPrivate());
         String clientChallenge = TestUtils.generateChallenge();
         LSRequest req;
-        LSSession noExist = new DefaultLSSession("noexist");
+        LSSession noExist = DefaultLSSession.getSession("noexist");
         WebSocket socket = new MockWebSocket();
         req = new LSRequest("noexist", new HashMap<>(), new Date(), 1L, clientChallenge, socket);
         req.setSession(noExist);
@@ -90,7 +90,7 @@ public class LoginHandlerTest {
         Assert.assertEquals(null, register.getSocket("noexist"));
 
         socket = new MockWebSocket();
-        LSSession sampleSession = new DefaultLSSession("sample");
+        LSSession sampleSession = DefaultLSSession.getSession("sample");
         req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, clientChallenge, socket);
         req.setSession(sampleSession);
         payload = new LSPayload();

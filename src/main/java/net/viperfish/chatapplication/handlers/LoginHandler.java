@@ -74,6 +74,7 @@ public final class LoginHandler implements RequestHandler {
         } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException ex) {
             this.logger.warn("cannot generate credential", ex);
             status.setStatus(LSStatus.INTERNAL_ERROR);
+            req.getSession().invalidate();
             return status;
         }
         String suppliedCredential = req.getData();
@@ -83,6 +84,7 @@ public final class LoginHandler implements RequestHandler {
         } catch (InvalidKeyException ex) {
             logger.warn("Invalid Key", ex);
             status.setStatus(LSStatus.INTERNAL_ERROR, "Invalid Public Key");
+            req.getSession().invalidate();
             return status;
         }
         try {
@@ -92,11 +94,13 @@ public final class LoginHandler implements RequestHandler {
                 req.getSession().setAttribute("publicKey", userKey);
             } else {
                 status.setStatus(LSStatus.LOGIN_FAIL, "Username or password incorrect");
+                req.getSession().invalidate();
                 return status;
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
             logger.warn("cannot verify signature", ex);
             status.setStatus(LSStatus.LOGIN_FAIL, "Server Cannot Verify Signature");
+            req.getSession().invalidate();
             return status;
         }
         return status;

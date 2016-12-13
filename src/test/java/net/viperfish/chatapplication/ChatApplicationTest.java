@@ -16,6 +16,7 @@ import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
@@ -66,6 +67,7 @@ public class ChatApplicationTest {
     @Test
     public void testLoginSuccess() throws JsonGenerationException, JsonMappingException, JsonParseException, InvalidKeyException, NoSuchAlgorithmException, SignatureException {
         reg.clear();
+        DefaultLSSession.clearAllSessions();
         MockWebSocket socket = new MockWebSocket();
         String clientChallenge = TestUtils.generateChallenge();
         LSRequest request = new LSRequest();
@@ -111,14 +113,17 @@ public class ChatApplicationTest {
     @Test
     public void testLoginFail() throws JsonGenerationException, JsonMappingException, JsonParseException, InvalidKeyException, NoSuchAlgorithmException, SignatureException {
         reg.clear();
+        DefaultLSSession.clearAllSessions();
         MockWebSocket socket = new MockWebSocket();
         LSRequest request = new LSRequest();
         request.setType(1L);
         request.setTimeStamp(new Date());
         request.setSource("testUser");
-        request.setData(TestUtils.generateCredential("0", testKey2.getPrivate()));
+        request.setData("0");
         String packet = generator.toJson(request);
         toTest.onMessage(socket, packet);
+        request.setData(TestUtils.generateCredential("0", testKey2.getPrivate()));
+        packet = generator.toJson(request);
         toTest.onMessage(socket, packet);
 
         LSPayload payload = generator.fromJson(LSPayload.class, socket.getSentData().get(1));
@@ -133,6 +138,7 @@ public class ChatApplicationTest {
     @Test
     public void testMessage() throws JsonGenerationException, JsonMappingException, JsonParseException {
         reg.clear();
+        DefaultLSSession.clearAllSessions();
         MockWebSocket socket = new MockWebSocket();
         MockWebSocket socket1 = new MockWebSocket();
         reg.register("testUser", socket);
@@ -164,6 +170,7 @@ public class ChatApplicationTest {
     @Test
     public void testMessageTargetNotFound() throws JsonGenerationException, JsonMappingException, JsonParseException {
         reg.clear();
+        DefaultLSSession.clearAllSessions();
         MockWebSocket socketSource = new MockWebSocket();
         reg.register("source",socketSource);
         Map<String, String> attrs = new HashMap<>();

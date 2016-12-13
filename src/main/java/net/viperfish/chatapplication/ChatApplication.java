@@ -14,7 +14,6 @@ import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSSession;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -35,11 +34,9 @@ public class ChatApplication extends WebSocketApplication {
     private UserRegister socketMapper;
     private final Logger logger;
     private final DefaultFilterChain filterChain;
-    private final Map<String, LSSession> sessions;
 
     public ChatApplication() {
         handlerMapper = new HashMap<>();
-        sessions = new HashMap<>();
         generator = new JsonGenerator();
         logger = LogManager.getLogger();
         filterChain = new DefaultFilterChain();
@@ -54,10 +51,7 @@ public class ChatApplication extends WebSocketApplication {
     }
 
     private void updateSessionInfo(LSRequest req) {
-        if (!sessions.containsKey(req.getSource())) {
-            sessions.put(req.getSource(), new DefaultLSSession(req.getSource()));
-        }
-        req.setSession(sessions.get(req.getSource()));
+        req.setSession(DefaultLSSession.getSession(req.getSource()));
     }
 
     private LSRequest convertToRequest(String data, WebSocket socket) throws JsonParseException, JsonMappingException {
@@ -72,7 +66,9 @@ public class ChatApplication extends WebSocketApplication {
             if (targetSocket == null || !targetSocket.isConnected()) {
                 status.setStatus(LSStatus.USER_OFFLINE, "Target User Offline");
             } else {
-                targetSocket.send(generator.toJson(payload));
+                String sentData = generator.toJson(payload);
+                logger.info("Sending:\n" + sentData);
+                targetSocket.send(sentData);
             }
         }
     }
@@ -136,6 +132,11 @@ public class ChatApplication extends WebSocketApplication {
     @Override
     public void onClose(WebSocket socket, DataFrame frame) {
         logger.info("Closing Socket");
+        String username = socketMapper.getUsername(socket);
+        if(username != null) {
+            logger.info("Invalidating session for " + username);
+            DefaultLSSession.getSession(username).invalidate();
+        }
         socketMapper.unregister(socket);
         super.onClose(socket, frame);
     }

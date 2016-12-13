@@ -24,6 +24,7 @@ public final class MessagingHandler implements RequestHandler {
 
     @Override
     public LSStatus handleRequest(LSRequest req, LSPayload resp) {
+        resp.setType(LSPayload.LS_MESSAGE);
         resp.setSource(req.getSource());
         resp.setTarget(req.getAttribute("target"));
         resp.setData(req.getData());

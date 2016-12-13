@@ -5,14 +5,11 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
@@ -21,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.sql.DataSource;
+import net.viperfish.chatapplication.core.KeyUtils;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -187,14 +185,8 @@ public class ApplicationRootContext implements AsyncConfigurer {
 
     @Bean
     public KeyPair serverKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] publicKeyBytes = Files.readAllBytes(Paths.get("pubkey.pub"));
-        byte[] privateKeyBytes = Files.readAllBytes(Paths.get("private.key"));
-        PKCS8EncodedKeySpec privateSpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        PrivateKey priv = KeyFactory.getInstance("EC").generatePrivate(privateSpec);
-        
-        X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(publicKeyBytes);
-        PublicKey publicKey = KeyFactory.getInstance("EC").generatePublic(publicSpec);
-        
+        PublicKey publicKey = KeyUtils.INSTANCE.readPublicKey(Paths.get("pubkey.pub"));
+        PrivateKey priv = KeyUtils.INSTANCE.readPrivateKey(Paths.get("private.key"));
         KeyPair result = new KeyPair(publicKey, priv);
         return result;
     }
