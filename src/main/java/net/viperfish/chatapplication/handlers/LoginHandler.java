@@ -47,6 +47,19 @@ public final class LoginHandler implements RequestHandler {
     public void init() {
     }
 
+    private void setChallengeSession(LSRequest req, LSStatus status) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+        status.setStatus(LSStatus.CHALLENGE);
+        SecureRandom rand = new SecureRandom();
+        long chg = 0;
+        while (chg == 0) {
+            chg = rand.nextLong();
+        }
+
+        String challengeResponse = this.generateCredential(req.getData(), priv);
+        status.setAdditional(Long.toString(chg) + ";" + challengeResponse);
+        req.getSession().setAttribute("imposedChallenge", Long.toString(chg));
+    }
+
     @Override
     public LSStatus handleRequest(LSRequest req, LSPayload resp) {
         User u = userDB.findByUsername(req.getSource());
@@ -57,19 +70,8 @@ public final class LoginHandler implements RequestHandler {
         }
         try {
             if (req.getSession().getAttribute("imposedChallenge", String.class) == null) {
-
-                status.setStatus(LSStatus.CHALLENGE);
-                SecureRandom rand = new SecureRandom();
-                long chg = 0;
-                while (chg == 0) {
-                    chg = rand.nextLong();
-                }
-
-                String challengeResponse = this.generateCredential(req.getData(), priv);
-                status.setAdditional(Long.toString(chg) + ";" + challengeResponse);
-                req.getSession().setAttribute("imposedChallenge", Long.toString(chg));
+                setChallengeSession(req, status);
                 return status;
-
             }
         } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException ex) {
             this.logger.warn("cannot generate credential", ex);
