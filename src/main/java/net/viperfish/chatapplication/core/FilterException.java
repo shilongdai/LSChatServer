@@ -9,6 +9,16 @@ package net.viperfish.chatapplication.core;
  *
  * @author sdai
  */
-public interface LSFilter {
-    public LSStatus doFilter(LSRequest req, LSPayload resp, LSFilterChain chain) throws FilterException;
+public class FilterException extends Exception {
+    private LSStatus status;
+
+    public FilterException(LSStatus status) {
+        this.status = status;
+    }
+
+    public LSStatus getStatus() {
+        return status;
+    }
+    
+    
 }

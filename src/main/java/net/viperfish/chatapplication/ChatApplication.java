@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
+import net.viperfish.chatapplication.core.LSFilter;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
@@ -141,4 +142,8 @@ public class ChatApplication extends WebSocketApplication {
         super.onClose(socket, frame);
     }
 
+    public void addFilter(LSFilter filter) {
+        this.filterChain.addFilter(filter);
+    }
+    
 }

@@ -7,12 +7,15 @@ package net.viperfish.chatapplication;
 
 import java.util.LinkedList;
 import java.util.List;
+import net.viperfish.chatapplication.core.FilterException;
 import net.viperfish.chatapplication.core.LSFilter;
 import net.viperfish.chatapplication.core.LSFilterChain;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSStatus;
 import net.viperfish.chatapplication.core.RequestHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -23,9 +26,11 @@ class DefaultFilterChain implements LSFilterChain {
     private RequestHandler endpoint;
     private final List<LSFilter> filters;
     private int current;
-
+    private Logger logger;
+    
     public DefaultFilterChain() {
         filters = new LinkedList<>();
+        logger = LogManager.getLogger();
     }
 
     
@@ -44,17 +49,23 @@ class DefaultFilterChain implements LSFilterChain {
     
     public LSStatus process(LSRequest req, LSPayload payload) {
         current = 0;
-        doFilter(req, payload);
-        return endpoint.handleRequest(req, payload);
+        try {
+            return doFilter(req, payload);
+        } catch (FilterException ex) {
+            logger.info("exceptional filter status", ex);
+            return ex.getStatus();
+        }
     }
     
     
     @Override
-    public void doFilter(LSRequest req, LSPayload resp) {
+    public LSStatus doFilter(LSRequest req, LSPayload resp) throws FilterException {
         if(current < filters.size()) {
             LSFilter filter = filters.get(current);
             current+=1;
-            filter.doFilter(req, resp, this);
+            return filter.doFilter(req, resp, this);
+        } else {
+            return endpoint.handleRequest(req, resp);
         }
     }
     

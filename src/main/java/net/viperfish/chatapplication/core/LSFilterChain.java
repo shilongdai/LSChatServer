@@ -10,6 +10,6 @@ package net.viperfish.chatapplication.core;
  * @author sdai
  */
 public interface LSFilterChain {
-    public void doFilter(LSRequest req, LSPayload resp);
+    public LSStatus doFilter(LSRequest req, LSPayload resp) throws FilterException;
     
 }

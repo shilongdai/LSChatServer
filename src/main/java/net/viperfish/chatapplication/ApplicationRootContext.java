@@ -22,6 +22,7 @@ import net.viperfish.chatapplication.core.KeyUtils;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
+import net.viperfish.chatapplication.filters.AuthenticationFilter;
 import net.viperfish.chatapplication.handlers.LoginHandler;
 import net.viperfish.chatapplication.handlers.MessagingHandler;
 import org.apache.commons.configuration.ConfigurationException;
@@ -180,6 +181,7 @@ public class ApplicationRootContext implements AsyncConfigurer {
         application.setSocketMapper(this.userRegister());
         application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister(), this.serverKey().getPrivate()));
         application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
+        application.addFilter(new AuthenticationFilter(this.serverKey()));
         return application;
     }
 

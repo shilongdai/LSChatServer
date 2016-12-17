@@ -19,6 +19,7 @@ public class LSStatus implements Serializable {
     public static final int USER_OFFLINE = 203;
     public static final int INTERNAL_ERROR = 204;
     public static final int CHALLENGE = 205;
+    public static final int AUTHENTICATE_FAIL = 206;
     
     private int status;
     
