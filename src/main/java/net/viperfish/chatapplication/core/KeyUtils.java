@@ -55,4 +55,9 @@ public enum KeyUtils {
         PrivateKey priv = KeyFactory.getInstance("EC").generatePrivate(privateSpec);
         return priv;
     }
+    
+    public void writePublicKey(Path publicKey, PublicKey pub) throws IOException {
+        byte[] keyBytes = pub.getEncoded();
+        Files.write(publicKey, keyBytes, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+    }
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -21,8 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.websockets.WebSocketAddOn;
-import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -39,14 +38,7 @@ public class Bootstrap {
                 ApplicationRootContext.class);
         rootContext.start();
         rootContext.registerShutdownHook();
-        HttpServer server = HttpServer.createSimpleServer("./", 8080);
-        WebSocketAddOn addon = new WebSocketAddOn();
-        server.getListeners().stream().forEach((listen) -> {
-            listen.registerAddOn(addon);
-        });
-        
-        ChatApplication application = rootContext.getBean(ChatApplication.class);
-        WebSocketEngine.getEngine().register("", "/messenger", application);
+        HttpServer server = rootContext.getBean(HttpServer.class);
 
         UserDatabase userDB = rootContext.getBean(UserDatabase.class);
         Scanner inputReader = new Scanner(System.in);
@@ -90,6 +82,10 @@ public class Bootstrap {
                     }
                     case "clearUser": {
                         userDB.deleteAll();
+                        break;
+                    }
+                    case "writePublicKey": {
+                        KeyUtils.INSTANCE.writePublicKey(Paths.get("server.pub"), rootContext.getBean(KeyPair.class).getPublic());
                         break;
                     }
                     default: {

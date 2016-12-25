@@ -1,14 +1,21 @@
 package net.viperfish.chatapplication;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -18,11 +25,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.sql.DataSource;
-import net.viperfish.chatapplication.core.KeyUtils;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
-import net.viperfish.chatapplication.filters.AuthenticationFilter;
 import net.viperfish.chatapplication.handlers.LoginHandler;
 import net.viperfish.chatapplication.handlers.MessagingHandler;
 import org.apache.commons.configuration.ConfigurationException;
@@ -31,6 +36,11 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.grizzly.websockets.WebSocketAddOn;
+import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -176,21 +186,53 @@ public class ApplicationRootContext implements AsyncConfigurer {
     
 
     @Bean
-    public ChatApplication chatApplication() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public ChatApplication chatApplication() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
         ChatApplication application = new ChatApplication();
         application.setSocketMapper(this.userRegister());
         application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister(), this.serverKey().getPrivate()));
         application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
-        application.addFilter(new AuthenticationFilter(this.serverKey()));
         return application;
     }
 
     @Bean
-    public KeyPair serverKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        PublicKey publicKey = KeyUtils.INSTANCE.readPublicKey(Paths.get("pubkey.pub"));
-        PrivateKey priv = KeyUtils.INSTANCE.readPrivateKey(Paths.get("private.key"));
+    public KeyStore serverKeyStore() throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        File storeFile = new File("key.jks");
+        ks.load(new FileInputStream(storeFile), "123456".toCharArray());
+        return ks;
+    }
+    
+    @Bean
+    public KeyPair serverKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
+        KeyStore ks = this.serverKeyStore();
+        
+        PublicKey publicKey = ks.getCertificate("server").getPublicKey();
+        PrivateKey priv = ((KeyStore.PrivateKeyEntry) ks.getEntry("server", new KeyStore.PasswordProtection("123456".toCharArray()))).getPrivateKey();
         KeyPair result = new KeyPair(publicKey, priv);
         return result;
+    }
+    
+    @Bean
+    public SSLContextConfigurator sslConf() {
+       SSLContextConfigurator config = new SSLContextConfigurator();
+       config.setKeyStoreFile("key.jks");
+       config.setKeyStorePass("123456");
+       return config;
+    }
+    
+    @Bean
+    public HttpServer httpServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
+        HttpServer server = HttpServer.createSimpleServer("./", 8080);
+        WebSocketAddOn addon = new WebSocketAddOn();
+        server.getListeners().stream().forEach((listen) -> {
+            listen.registerAddOn(addon);
+            listen.setSecure(true);
+            listen.setSSLEngineConfig(new SSLEngineConfigurator(this.sslConf()).setClientMode(false).setNeedClientAuth(false));
+        });
+        
+        ChatApplication application = this.chatApplication();
+        WebSocketEngine.getEngine().register("", "/messenger", application);
+        return server;
     }
     
 }
