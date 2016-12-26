@@ -7,12 +7,19 @@ package net.viperfish.chatapplication.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 /**
@@ -21,21 +28,24 @@ import javax.persistence.Table;
  */
 @Entity
 @Table
-public class User implements Serializable{
+public class User implements Serializable {
 
     private String username;
     private byte[] credential;
     private Long id;
+    private List<String> associates;
 
     public User() {
         username = new String();
         credential = null;
         id = null;
+        associates = new LinkedList<>();
     }
 
     public User(String username, byte[] credential) {
         this.username = username;
         this.credential = credential.clone();
+        associates = new LinkedList<>();
     }
 
     @Basic
@@ -64,6 +74,18 @@ public class User implements Serializable{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "User_Associate", joinColumns = {
+        @JoinColumn(referencedColumnName = "Id", name = "UserId")})
+    @Column(name = "name")
+    public List<String> getAssociates() {
+        return associates;
+    }
+
+    public void setAssociates(List<String> associates) {
+        this.associates = associates;
     }
 
     @Override
@@ -98,7 +120,5 @@ public class User implements Serializable{
         }
         return true;
     }
-
-    
 
 }

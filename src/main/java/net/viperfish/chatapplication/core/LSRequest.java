@@ -26,6 +26,7 @@ public class LSRequest implements Serializable {
 
     public static final long LS_LOGIN=1;
     public static final long LS_MESSAGE=2;
+    public static final long LS_ASSOCIATE_LOOKUP=3;
     
     private String source;
     private Map<String, String> attributes;

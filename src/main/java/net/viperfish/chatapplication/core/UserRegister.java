@@ -61,4 +61,8 @@ public class UserRegister {
         mapping.clear();
         reverseMapping.clear();
     }
+    
+    public boolean isOnline(String user) {
+        return mapping.containsKey(user);
+    }
 }

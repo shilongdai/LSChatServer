@@ -20,7 +20,7 @@ import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -85,9 +85,9 @@ public class ChatApplicationTest {
         Assert.assertEquals(null, payload.getSource());
         Assert.assertEquals(null, payload.getTarget());
         
-        LSStatus resp = generator.fromJson(LSStatus.class, payload.getData());
-        Assert.assertEquals(LSStatus.CHALLENGE, resp.getStatus());
-        String signature = resp.getAdditional().split(";")[1];
+        LSResponse resp = generator.fromJson(LSResponse.class, payload.getData());
+        Assert.assertEquals(LSResponse.CHALLENGE, resp.getStatus());
+        String signature = resp.getData().split(";")[1];
         Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, signature, serverPub));
         
         
@@ -95,7 +95,7 @@ public class ChatApplicationTest {
         request.setType(1L);
         request.setTimeStamp(new Date());
         request.setSource("testUser");
-        request.setData(TestUtils.generateCredential(resp.getAdditional().split(";")[0], testKey1.getPrivate()));
+        request.setData(TestUtils.generateCredential(resp.getData().split(";")[0], testKey1.getPrivate()));
         packet = generator.toJson(request);
         toTest.onMessage(socket, packet);
         payload = generator.fromJson(LSPayload.class, socket.getSentData().get(1));
@@ -103,9 +103,9 @@ public class ChatApplicationTest {
         Assert.assertEquals(null, payload.getSource());
         Assert.assertEquals("testUser", payload.getTarget());
         
-        resp = generator.fromJson(LSStatus.class, payload.getData());
+        resp = generator.fromJson(LSResponse.class, payload.getData());
         
-        Assert.assertEquals(LSStatus.SUCCESS, resp.getStatus());
+        Assert.assertEquals(LSResponse.SUCCESS, resp.getStatus());
         Assert.assertNotEquals(null, reg.getSocket("testUser"));
     }
     
@@ -131,8 +131,8 @@ public class ChatApplicationTest {
         Assert.assertEquals(null, payload.getSource());
         Assert.assertEquals(null, payload.getTarget());
         
-        LSStatus resp = generator.fromJson(LSStatus.class, payload.getData());
-        Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
+        LSResponse resp = generator.fromJson(LSResponse.class, payload.getData());
+        Assert.assertEquals(LSResponse.LOGIN_FAIL, resp.getStatus());
     }
 
     @Test
@@ -157,8 +157,8 @@ public class ChatApplicationTest {
         Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
         Assert.assertEquals(null, payload.getSource());
         Assert.assertEquals("testUser1", payload.getTarget());
-        LSStatus status = generator.fromJson(LSStatus.class, payload.getData());
-        Assert.assertEquals(LSStatus.SUCCESS, status.getStatus());
+        LSResponse status = generator.fromJson(LSResponse.class, payload.getData());
+        Assert.assertEquals(LSResponse.SUCCESS, status.getStatus());
         
         Assert.assertEquals(1, socket.getSentData().size());
         LSPayload received = generator.fromJson(LSPayload.class, socket.getSentData().get(0));
@@ -183,8 +183,8 @@ public class ChatApplicationTest {
         Assert.assertEquals(LSPayload.LS_STATUS, payload.getType());
         Assert.assertEquals(null, payload.getSource());
         Assert.assertEquals("source", payload.getTarget());
-        LSStatus status = generator.fromJson(LSStatus.class, payload.getData());
-        Assert.assertEquals(LSStatus.USER_OFFLINE, status.getStatus());
+        LSResponse status = generator.fromJson(LSResponse.class, payload.getData());
+        Assert.assertEquals(LSResponse.USER_OFFLINE, status.getStatus());
         
     }
 

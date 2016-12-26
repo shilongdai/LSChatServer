@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.viperfish.chatapplication.core;
+package net.viperfish.lib;
 
 /**
  *
  * @author sdai
  */
-public interface LSFilterChain {
-    public LSResponse doFilter(LSRequest req, LSPayload resp) throws FilterException;
-    
+public interface Observer<T> {
+    public <T> void observe(T data);
+
 }

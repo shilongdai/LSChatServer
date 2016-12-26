@@ -10,13 +10,13 @@ package net.viperfish.chatapplication.core;
  * @author sdai
  */
 public class FilterException extends Exception {
-    private LSStatus status;
+    private LSResponse status;
 
-    public FilterException(LSStatus status) {
+    public FilterException(LSResponse status) {
         this.status = status;
     }
 
-    public LSStatus getStatus() {
+    public LSResponse getStatus() {
         return status;
     }
     

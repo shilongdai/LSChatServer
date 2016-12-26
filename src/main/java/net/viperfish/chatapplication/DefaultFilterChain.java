@@ -12,7 +12,7 @@ import net.viperfish.chatapplication.core.LSFilter;
 import net.viperfish.chatapplication.core.LSFilterChain;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.RequestHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,7 @@ class DefaultFilterChain implements LSFilterChain {
         filters.add(filter);
     }
     
-    public LSStatus process(LSRequest req, LSPayload payload) {
+    public LSResponse process(LSRequest req, LSPayload payload) {
         current = 0;
         try {
             return doFilter(req, payload);
@@ -59,7 +59,7 @@ class DefaultFilterChain implements LSFilterChain {
     
     
     @Override
-    public LSStatus doFilter(LSRequest req, LSPayload resp) throws FilterException {
+    public LSResponse doFilter(LSRequest req, LSPayload resp) throws FilterException {
         if(current < filters.size()) {
             LSFilter filter = filters.get(current);
             current+=1;

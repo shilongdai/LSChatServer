@@ -15,7 +15,7 @@ import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSFilter;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.UserRegister;
 import org.apache.logging.log4j.LogManager;
@@ -61,11 +61,11 @@ public class ChatApplication extends WebSocketApplication {
         return req;
     }
 
-    private void sendPayload(LSPayload payload, LSStatus status) throws JsonGenerationException, JsonMappingException {
+    private void sendPayload(LSPayload payload, LSResponse status) throws JsonGenerationException, JsonMappingException {
         if (payload.getTarget() != null) {
             WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
             if (targetSocket == null || !targetSocket.isConnected()) {
-                status.setStatus(LSStatus.USER_OFFLINE, "Target User Offline");
+                status.setStatus(LSResponse.USER_OFFLINE, "Target User Offline");
             } else {
                 String sentData = generator.toJson(payload);
                 logger.info("Sending:\n" + sentData);
@@ -74,22 +74,22 @@ public class ChatApplication extends WebSocketApplication {
         }
     }
 
-    private LSStatus handleRequest(LSRequest req, WebSocket socket) throws JsonGenerationException, JsonMappingException {
+    private LSResponse handleRequest(LSRequest req, WebSocket socket) throws JsonGenerationException, JsonMappingException {
         RequestHandler handler = handlerMapper.get(req.getType());
         LSPayload payload = new LSPayload();
-        LSStatus status = new LSStatus();
+        LSResponse status = new LSResponse();
         if (handler != null) {
             filterChain.setEndpoint(handler);
             status = filterChain.process(req, payload);
             sendPayload(payload, status);
         } else {
             logger.info("No Handler Present For Message Type:" + req.getType());
-            status.setStatus(LSStatus.NO_HANDLER, "No Handler Found For Type" + req.getType());
+            status.setStatus(LSResponse.NO_HANDLER, "No Handler Found For Type" + req.getType());
         }
         return status;
     }
 
-    private void sendStatus(LSPayload statusPayload, LSStatus status, WebSocket origin) throws JsonGenerationException, JsonMappingException {
+    private void sendStatus(LSPayload statusPayload, LSResponse status, WebSocket origin) throws JsonGenerationException, JsonMappingException {
         statusPayload.setData(generator.toJson(status));
         statusPayload.setSource(null);
         statusPayload.setType(LSPayload.LS_STATUS);
@@ -99,7 +99,7 @@ public class ChatApplication extends WebSocketApplication {
     @Override
     public void onMessage(WebSocket socket, String text) {
         logger.info("Received Message:" + text);
-        LSStatus status = new LSStatus();
+        LSResponse status = new LSResponse();
         LSPayload statusPayload = new LSPayload();
         statusPayload.setSource(null);
         try {
@@ -119,7 +119,7 @@ public class ChatApplication extends WebSocketApplication {
             }
         } catch (JsonParseException | JsonMappingException | JsonGenerationException ex) {
             logger.warn("Exception Caught:" + ex);
-            status.setStatus(LSStatus.INTERNAL_ERROR, "JSON Processing Error ");
+            status.setStatus(LSResponse.INTERNAL_ERROR, "JSON Processing Error ");
         } finally {
             try {
                 sendStatus(statusPayload, status, socket);

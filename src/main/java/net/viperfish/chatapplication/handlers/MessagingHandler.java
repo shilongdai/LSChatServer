@@ -7,7 +7,7 @@ package net.viperfish.chatapplication.handlers;
 
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.RequestHandler;
 
 /**
@@ -23,13 +23,13 @@ public final class MessagingHandler implements RequestHandler {
     }
 
     @Override
-    public LSStatus handleRequest(LSRequest req, LSPayload resp) {
+    public LSResponse handleRequest(LSRequest req, LSPayload resp) {
         resp.setType(LSPayload.LS_MESSAGE);
         resp.setSource(req.getSource());
         resp.setTarget(req.getAttribute("target"));
         resp.setData(req.getData());
         
-        return new LSStatus(LSStatus.SUCCESS, "Message Proccessed", "");
+        return new LSResponse(LSResponse.SUCCESS, "Message Proccessed", "");
     }
     
 }

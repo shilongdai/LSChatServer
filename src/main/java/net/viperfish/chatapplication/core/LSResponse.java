@@ -6,12 +6,14 @@
 package net.viperfish.chatapplication.core;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author sdai
  */
-public class LSStatus implements Serializable {
+public class LSResponse implements Serializable {
 
     public static final int SUCCESS = 200;
     public static final int LOGIN_FAIL = 201;
@@ -25,19 +27,23 @@ public class LSStatus implements Serializable {
     
     private String reason;
     
-    private String additional;
+    private String data;
+    
+    private Map<String, String> attributes;
 
-    public LSStatus(int status, String reason, String additional) {
+    public LSResponse(int status, String reason, String data) {
         this.status = status;
         this.reason = reason;
-        this.additional = additional;
+        this.data = data;
+        attributes = new HashMap<>();
     }
     
     
-    public LSStatus() {
+    public LSResponse() {
         status = 200;
         this.reason = "Success";
-        additional = "";
+        data = "";
+        attributes = new HashMap<>();
     }
     
     public int getStatus() {
@@ -57,13 +63,23 @@ public class LSStatus implements Serializable {
         this.reason = reason;
     }
 
-    public String getAdditional() {
-        return additional;
+    public String getData() {
+        return data;
     }
 
-    public void setAdditional(String additional) {
-        this.additional = additional;
+    public void setData(String data) {
+        this.data = data;
     }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
+    }
+    
+    
 
     
     

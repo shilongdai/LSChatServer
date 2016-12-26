@@ -18,7 +18,7 @@ import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSSession;
-import net.viperfish.chatapplication.core.LSStatus;
+import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -58,18 +58,18 @@ public class LoginHandlerTest {
         LSRequest req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, clientChallenge, socket);
         req.setSession(session);
         LSPayload payload = new LSPayload();
-        LSStatus resp = handler.handleRequest(req, payload);
+        LSResponse resp = handler.handleRequest(req, payload);
 
-        Assert.assertEquals(LSStatus.CHALLENGE, resp.getStatus());
+        Assert.assertEquals(LSResponse.CHALLENGE, resp.getStatus());
         Assert.assertEquals(true, req.getSession().containsAttribute("imposedChallenge"));
-        Assert.assertNotEquals(0, resp.getAdditional().length());
-        Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, resp.getAdditional().split(";")[1], serverKey.getPublic()));
+        Assert.assertNotEquals(0, resp.getData().length());
+        Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, resp.getData().split(";")[1], serverKey.getPublic()));
 
-        req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, TestUtils.generateCredential(resp.getAdditional().split(";")[0], testKey.getPrivate()), socket);
+        req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, TestUtils.generateCredential(resp.getData().split(";")[0], testKey.getPrivate()), socket);
         req.setSession(session);
         resp = handler.handleRequest(req, payload);
 
-        Assert.assertEquals(LSStatus.SUCCESS, resp.getStatus());
+        Assert.assertEquals(LSResponse.SUCCESS, resp.getStatus());
         Assert.assertNotEquals(null, register.getSocket("sample"));
         Assert.assertArrayEquals(testKey.getPublic().getEncoded(), req.getSession().getAttribute("publicKey", PublicKey.class).getEncoded());
     }
@@ -85,8 +85,8 @@ public class LoginHandlerTest {
         req = new LSRequest("noexist", new HashMap<>(), new Date(), 1L, clientChallenge, socket);
         req.setSession(noExist);
         LSPayload payload = new LSPayload();
-        LSStatus resp = handler.handleRequest(req, payload);
-        Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
+        LSResponse resp = handler.handleRequest(req, payload);
+        Assert.assertEquals(LSResponse.LOGIN_FAIL, resp.getStatus());
         Assert.assertEquals(null, register.getSocket("noexist"));
 
         socket = new MockWebSocket();
@@ -95,14 +95,14 @@ public class LoginHandlerTest {
         req.setSession(sampleSession);
         payload = new LSPayload();
         resp = handler.handleRequest(req, payload);
-        Assert.assertEquals(LSStatus.CHALLENGE, resp.getStatus());
-        Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, resp.getAdditional().split(";")[1], serverKey.getPublic()));
+        Assert.assertEquals(LSResponse.CHALLENGE, resp.getStatus());
+        Assert.assertEquals(true, TestUtils.verifyChallenge(clientChallenge, resp.getData().split(";")[1], serverKey.getPublic()));
 
         req = new LSRequest("sample", new HashMap<>(), new Date(), 1L, TestUtils.generateCredential("0", testKey.getPrivate()), socket);
         req.setSession(sampleSession);
         resp = handler.handleRequest(req, payload);
 
-        Assert.assertEquals(LSStatus.LOGIN_FAIL, resp.getStatus());
+        Assert.assertEquals(LSResponse.LOGIN_FAIL, resp.getStatus());
         Assert.assertEquals(null, register.getSocket("sample"));
         Assert.assertEquals(false, req.getSession().containsAttribute("publicKey"));
     }
