@@ -7,9 +7,9 @@ package net.viperfish.chatapplication.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -21,6 +21,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  *
@@ -28,27 +30,29 @@ import javax.persistence.Table;
  */
 @Entity
 @Table
+@Indexed
 public class User implements Serializable {
 
     private String username;
     private byte[] credential;
     private Long id;
-    private List<String> associates;
+    private Set<String> associates;
 
     public User() {
         username = new String();
         credential = null;
         id = null;
-        associates = new LinkedList<>();
+        associates = new HashSet<>();
     }
 
     public User(String username, byte[] credential) {
         this.username = username;
         this.credential = credential.clone();
-        associates = new LinkedList<>();
+        associates = new HashSet<>();
     }
 
     @Basic
+    @Field
     public String getUsername() {
         return username;
     }
@@ -80,20 +84,21 @@ public class User implements Serializable {
     @CollectionTable(name = "User_Associate", joinColumns = {
         @JoinColumn(referencedColumnName = "Id", name = "UserId")})
     @Column(name = "name")
-    public List<String> getAssociates() {
+    public Set<String> getAssociates() {
         return associates;
     }
 
-    public void setAssociates(List<String> associates) {
+    public void setAssociates(Set<String> associates) {
         this.associates = associates;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.username);
-        hash = 17 * hash + Arrays.hashCode(this.credential);
-        hash = 17 * hash + Objects.hashCode(this.id);
+        int hash = 3;
+        hash = 73 * hash + Objects.hashCode(this.username);
+        hash = 73 * hash + Arrays.hashCode(this.credential);
+        hash = 73 * hash + Objects.hashCode(this.id);
+        hash = 73 * hash + Objects.hashCode(this.associates);
         return hash;
     }
 
@@ -115,10 +120,12 @@ public class User implements Serializable {
         if (!Arrays.equals(this.credential, other.credential)) {
             return false;
         }
-        if (!Objects.equals(this.id, other.id)) {
+        if (!Objects.equals(this.associates, other.associates)) {
             return false;
         }
         return true;
     }
+
+   
 
 }

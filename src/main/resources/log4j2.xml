@@ -20,10 +20,10 @@
         <logger name="net.viperfish" level="info">
             <appender-ref ref="chat" />
         </logger>
-        <logger name="org.apache" level="warn">
+        <logger name="org.apache" level="info">
             <appender-ref ref="chat" />
         </logger>
-        <logger name="org.springframework" level="warn">
+        <logger name="org.springframework" level="info">
         	<appender-ref ref="chat"></appender-ref>
         </logger>
     </loggers>

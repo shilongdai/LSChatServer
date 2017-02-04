@@ -8,6 +8,7 @@ package net.viperfish.chatapplication.handlers;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.Set;
+import net.viperfish.chatapplication.MockWebSocket;
 import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSPayload;
@@ -51,6 +52,9 @@ public class AssociateLookupHandlerTest {
        userdb.save(u1);
        userdb.save(u2);
        userdb.save(u3);
+       
+       userRegister.register("test1", new MockWebSocket());
+       userRegister.register("test2", new MockWebSocket());
    }
    
    @Test
@@ -72,7 +76,14 @@ public class AssociateLookupHandlerTest {
        Assert.assertEquals(2, associates.size());
        Assert.assertEquals(true, associates.contains("test2"));
        Assert.assertEquals(true, associates.contains("test3"));
+       
+       associateRequest.getAttributes().put("checkOnline", "true");
+       
+       stat = handler.handleRequest(associateRequest, resp);
+       associates = generator.fromJson(Set.class, stat.getData());
+       Assert.assertEquals(LSResponse.SUCCESS, stat.getStatus());
+       Assert.assertEquals(1, associates.size());
+       Assert.assertEquals(true, associates.contains("test2"));
    }
-   
    
 }

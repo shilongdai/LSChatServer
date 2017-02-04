@@ -24,10 +24,13 @@ import org.glassfish.grizzly.websockets.WebSocket;
  */
 public class LSRequest implements Serializable {
 
-    public static final long LS_LOGIN=1;
-    public static final long LS_MESSAGE=2;
-    public static final long LS_ASSOCIATE_LOOKUP=3;
-    
+    public static final long LS_LOGIN = 1;
+    public static final long LS_MESSAGE = 2;
+    public static final long LS_ASSOCIATE_LOOKUP = 3;
+    public static final long LS_ADD_ASSOCIATE = 4;
+    public static final long LS_LOOKUP_USER = 5;
+    public static final long LS_DELETE_ASSOCIATE = 6;
+
     private String source;
     private Map<String, String> attributes;
     private Date timeStamp;
@@ -35,7 +38,7 @@ public class LSRequest implements Serializable {
     private String data;
     private transient WebSocket socket;
     private transient LSSession session;
-    
+
     public LSRequest(String from, Map<String, String> attributes, Date timeStamp, Long type, String data, WebSocket sock) {
         this.source = from;
         this.attributes = attributes;
@@ -58,8 +61,6 @@ public class LSRequest implements Serializable {
         this.source = from;
     }
 
-
-
     public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
     }
@@ -79,7 +80,6 @@ public class LSRequest implements Serializable {
     public void setSocket(WebSocket socket) {
         this.socket = socket;
     }
-    
 
     public String getSource() {
         return this.source;
@@ -129,16 +129,15 @@ public class LSRequest implements Serializable {
         return this.socket;
     }
 
-    
     @JsonIgnore
     public LSSession getSession() {
         return this.session;
     }
-    
+
     public void setSession(LSSession session) {
         this.session = session;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -180,6 +179,4 @@ public class LSRequest implements Serializable {
         return true;
     }
 
-    
-    
 }

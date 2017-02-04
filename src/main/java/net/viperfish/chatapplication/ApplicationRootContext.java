@@ -29,8 +29,12 @@ import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
 import net.viperfish.chatapplication.filters.AuthenticationFilter;
+import net.viperfish.chatapplication.handlers.AddAssociateHandler;
+import net.viperfish.chatapplication.handlers.AssociateLookupHandler;
+import net.viperfish.chatapplication.handlers.DeleteAssociateHandler;
 import net.viperfish.chatapplication.handlers.LoginHandler;
 import net.viperfish.chatapplication.handlers.MessagingHandler;
+import net.viperfish.chatapplication.handlers.SearchUserHandler;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -148,6 +152,8 @@ public class ApplicationRootContext implements AsyncConfigurer {
         properties.put("hibernate.connection.characterEncoding", "utf8");
         properties.put("hibernate.connection.useUnicode", "true");
         properties.put("hibernate.connection.charSet", "utf8");
+        properties.put("hibernate.search.default.directory_provider", "filesystem");
+        properties.put("hibernate.search.default.indexBase", "./index");
 
         HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
         adapter.setDatabasePlatform("org.hibernate.dialect.MySQL5InnoDBDialect");
@@ -179,12 +185,11 @@ public class ApplicationRootContext implements AsyncConfigurer {
         config.load();
         return config;
     }
-    
+
     @Bean
     public UserRegister userRegister() {
         return new UserRegister();
     }
-    
 
     @Bean
     public ChatApplication chatApplication() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
@@ -192,6 +197,10 @@ public class ApplicationRootContext implements AsyncConfigurer {
         application.setSocketMapper(this.userRegister());
         application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister(), this.serverKey().getPrivate()));
         application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
+        application.addHandler(LSRequest.LS_ASSOCIATE_LOOKUP, new AssociateLookupHandler(userDatabase, this.userRegister()));
+        application.addHandler(LSRequest.LS_ADD_ASSOCIATE, new AddAssociateHandler(userDatabase));
+        application.addHandler(LSRequest.LS_LOOKUP_USER, new SearchUserHandler(userDatabase));
+        application.addHandler(LSRequest.LS_DELETE_ASSOCIATE, new DeleteAssociateHandler(userDatabase));
         application.addFilter(new AuthenticationFilter(this.serverKey()));
         return application;
     }
@@ -203,25 +212,25 @@ public class ApplicationRootContext implements AsyncConfigurer {
         ks.load(new FileInputStream(storeFile), "123456".toCharArray());
         return ks;
     }
-    
+
     @Bean
     public KeyPair serverKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
         KeyStore ks = this.serverKeyStore();
-        
+
         PublicKey publicKey = ks.getCertificate("server").getPublicKey();
         PrivateKey priv = ((KeyStore.PrivateKeyEntry) ks.getEntry("server", new KeyStore.PasswordProtection("123456".toCharArray()))).getPrivateKey();
         KeyPair result = new KeyPair(publicKey, priv);
         return result;
     }
-    
+
     @Bean
     public SSLContextConfigurator sslConf() {
-       SSLContextConfigurator config = new SSLContextConfigurator();
-       config.setKeyStoreFile("key.jks");
-       config.setKeyStorePass("123456");
-       return config;
+        SSLContextConfigurator config = new SSLContextConfigurator();
+        config.setKeyStoreFile("key.jks");
+        config.setKeyStorePass("123456");
+        return config;
     }
-    
+
     @Bean
     public HttpServer httpServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, FileNotFoundException, CertificateException, UnrecoverableEntryException {
         HttpServer server = HttpServer.createSimpleServer("./", 8080);
@@ -231,10 +240,10 @@ public class ApplicationRootContext implements AsyncConfigurer {
             listen.setSecure(true);
             listen.setSSLEngineConfig(new SSLEngineConfigurator(this.sslConf()).setClientMode(false).setNeedClientAuth(false));
         });
-        
+
         ChatApplication application = this.chatApplication();
         WebSocketEngine.getEngine().register("", "/messenger", application);
         return server;
     }
-    
+
 }

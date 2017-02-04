@@ -22,6 +22,8 @@ public class LSResponse implements Serializable {
     public static final int INTERNAL_ERROR = 204;
     public static final int CHALLENGE = 205;
     public static final int AUTHENTICATE_FAIL = 206;
+    public static final int USER_NOT_FOUND = 207;
+    public static final int INVALID_REQUEST = 208;
     
     private int status;
     
@@ -41,7 +43,7 @@ public class LSResponse implements Serializable {
     
     public LSResponse() {
         status = 200;
-        this.reason = "Success";
+        this.reason = "";
         data = "";
         attributes = new HashMap<>();
     }

@@ -5,6 +5,7 @@
  */
 package net.viperfish.chatapplication.userdb;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class RAMUserDatabase implements UserDatabase {
 
     @Override
     public <S extends User> Iterable<S> save(Iterable<S> entities) {
-        for(User i : entities) {
+        for (User i : entities) {
             this.save(i);
         }
         return entities;
@@ -57,7 +58,7 @@ public class RAMUserDatabase implements UserDatabase {
     @Override
     public Iterable<User> findAll() {
         List<User> result = new LinkedList<User>();
-        for(Map.Entry<Long, User> i : idMapping.entrySet()) {
+        for (Map.Entry<Long, User> i : idMapping.entrySet()) {
             result.add(i.getValue());
         }
         return result;
@@ -65,8 +66,8 @@ public class RAMUserDatabase implements UserDatabase {
 
     @Override
     public Iterable<User> findAll(Iterable<Long> ids) {
-        List<User> result= new LinkedList<>();
-        for(Long id : ids) {
+        List<User> result = new LinkedList<>();
+        for (Long id : ids) {
             result.add(this.findOne(id));
         }
         return result;
@@ -85,22 +86,20 @@ public class RAMUserDatabase implements UserDatabase {
 
     @Override
     public void delete(User entity) {
-        if(entity.getId() != null && idMapping.containsKey(entity.getId())) {
+        if (entity.getId() != null && idMapping.containsKey(entity.getId())) {
             mapping.remove(idMapping.remove(entity.getId()).getUsername());
-        } else {
-            if(entity.getUsername() != null && mapping.containsKey(entity.getUsername())) {
-                idMapping.remove(mapping.remove(entity.getUsername()).getId());
-            }
+        } else if (entity.getUsername() != null && mapping.containsKey(entity.getUsername())) {
+            idMapping.remove(mapping.remove(entity.getUsername()).getId());
         }
         return;
     }
 
     @Override
     public void delete(Iterable<? extends User> entities) {
-        for(User i : entities) {
+        for (User i : entities) {
             this.delete(i);
         }
-        
+
     }
 
     @Override
@@ -114,6 +113,15 @@ public class RAMUserDatabase implements UserDatabase {
         return mapping.get(username);
     }
 
-    
+    @Override
+    public Collection<User> search(String query) {
+        List<User> result = new LinkedList<>();
+        for (Map.Entry<String, User> e : mapping.entrySet()) {
+            if (e.getValue().getUsername().contains(query)) {
+                result.add(e.getValue());
+            }
+        }
+        return result;
+    }
 
 }
