@@ -21,7 +21,6 @@ public class AuthenticationFilterTest {
     @Test
     public void testAuthentication() throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, FilterException {
         KeyPair keyPair = TestUtils.generateKeyPair();
-        KeyPair serverPair = TestUtils.generateKeyPair();
         LSRequest req = new LSRequest();
         req.setSource("test");
         req.setType(LSRequest.LS_MESSAGE);
@@ -31,7 +30,7 @@ public class AuthenticationFilterTest {
         req.getAttributes().put("target", "sdai");
         req.getAttributes().put("signature", AuthenticationUtils.INSTANCE.signMessage("test data", req.getTimeStamp(), keyPair.getPrivate()));
         LSPayload payload = new LSPayload();
-        AuthenticationFilter filter = new AuthenticationFilter(serverPair);
+        AuthenticationFilter filter = new AuthenticationFilter();
         MockFilterChain mock =new MockFilterChain();
         filter.doFilter(req, payload, mock);
     }

@@ -33,7 +33,11 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed
 public class User implements Serializable {
 
-    private String username;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1512813050243600546L;
+	private String username;
     private byte[] credential;
     private Long id;
     private Set<String> associates;

@@ -17,7 +17,11 @@ import java.util.Objects;
  */
 public class LSPayload implements Serializable {
 
-    public static final int LS_STATUS = 1;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2007965376179027059L;
+	public static final int LS_STATUS = 1;
     public static final int LS_MESSAGE = 2;
 
     private String source;

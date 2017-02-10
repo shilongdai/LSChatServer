@@ -10,7 +10,11 @@ package net.viperfish.chatapplication.core;
  * @author sdai
  */
 public class FilterException extends Exception {
-    private LSResponse status;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3568391698152514818L;
+	private LSResponse status;
 
     public FilterException(LSResponse status) {
         this.status = status;

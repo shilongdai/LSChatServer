@@ -201,7 +201,7 @@ public class ApplicationRootContext implements AsyncConfigurer {
         application.addHandler(LSRequest.LS_ADD_ASSOCIATE, new AddAssociateHandler(userDatabase));
         application.addHandler(LSRequest.LS_LOOKUP_USER, new SearchUserHandler(userDatabase));
         application.addHandler(LSRequest.LS_DELETE_ASSOCIATE, new DeleteAssociateHandler(userDatabase));
-        application.addFilter(new AuthenticationFilter(this.serverKey()));
+        application.addFilter(new AuthenticationFilter());
         return application;
     }
 

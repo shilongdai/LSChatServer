@@ -41,8 +41,7 @@ public class Bootstrap {
         HttpServer server = rootContext.getBean(HttpServer.class);
 
         UserDatabase userDB = rootContext.getBean(UserDatabase.class);
-        Scanner inputReader = new Scanner(System.in);
-        try {
+        try(Scanner inputReader = new Scanner(System.in)) {
             server.start();
             while (true) {
                 System.out.print("command:");

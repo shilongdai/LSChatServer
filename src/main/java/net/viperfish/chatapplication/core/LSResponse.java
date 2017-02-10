@@ -15,7 +15,11 @@ import java.util.Map;
  */
 public class LSResponse implements Serializable {
 
-    public static final int SUCCESS = 200;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 304907510435821437L;
+	public static final int SUCCESS = 200;
     public static final int LOGIN_FAIL = 201;
     public static final int NO_HANDLER=202;
     public static final int USER_OFFLINE = 203;

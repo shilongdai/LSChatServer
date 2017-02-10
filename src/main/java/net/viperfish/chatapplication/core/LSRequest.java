@@ -24,7 +24,11 @@ import org.glassfish.grizzly.websockets.WebSocket;
  */
 public class LSRequest implements Serializable {
 
-    public static final long LS_LOGIN = 1;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4397309950514696170L;
+	public static final long LS_LOGIN = 1;
     public static final long LS_MESSAGE = 2;
     public static final long LS_ASSOCIATE_LOOKUP = 3;
     public static final long LS_ADD_ASSOCIATE = 4;
