@@ -21,16 +21,16 @@ import net.viperfish.chatapplication.core.AuthenticationUtils;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
-import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
+import net.viperfish.chatapplication.core.ValidatedRequestHandler;
 
 /**
  *
  * @author sdai
  */
-public final class LoginHandler implements RequestHandler {
+public final class LoginHandler extends ValidatedRequestHandler {
 
 	private final UserDatabase userDB;
 	private final UserRegister reg;
@@ -62,7 +62,18 @@ public final class LoginHandler implements RequestHandler {
 	}
 
 	@Override
-	public LSResponse handleRequest(LSRequest req, LSPayload resp) {
+	public boolean validate(LSRequest req) {
+		if (req.getSource() == null || req.getSource().length() == 0) {
+			return false;
+		}
+		if (req.getData() == null || req.getData().length() == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
 		User u = userDB.findByUsername(req.getSource());
 		LSResponse status = new LSResponse();
 		if (u == null) {

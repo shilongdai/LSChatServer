@@ -8,38 +8,49 @@ package net.viperfish.chatapplication.handlers;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
-import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
+import net.viperfish.chatapplication.core.ValidatedRequestHandler;
 
 /**
  *
  * @author sdai
  */
-public class DeleteAssociateHandler implements RequestHandler {
+public class DeleteAssociateHandler extends ValidatedRequestHandler {
 
-    private UserDatabase db;
-    
-    public DeleteAssociateHandler(UserDatabase db) {
-        this.db = db;
-    }
+	private UserDatabase db;
 
-    @Override
-    public void init() {
-    }
+	public DeleteAssociateHandler(UserDatabase db) {
+		this.db = db;
+	}
 
-    @Override
-    public LSResponse handleRequest(LSRequest req, LSPayload resp) {
-        String toDel = req.getData();
-        String user = req.getSource();
-        
-        User u = db.findByUsername(user);
-        u.getAssociates().remove(toDel);
-        db.save(u);
-        
-        LSResponse response = new LSResponse();
-        response.setStatus(LSResponse.SUCCESS);
-        return response;
-    }
-    
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public boolean validate(LSRequest req) {
+		if (req.getSource() == null || req.getSource().length() == 0) {
+			return false;
+		}
+		if (req.getData() == null || req.getData().length() == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+		String toDel = req.getData();
+		String user = req.getSource();
+
+		User u = db.findByUsername(user);
+		u.getAssociates().remove(toDel);
+		db.save(u);
+
+		LSResponse response = new LSResponse();
+		response.setStatus(LSResponse.SUCCESS);
+		return response;
+	}
+
 }
