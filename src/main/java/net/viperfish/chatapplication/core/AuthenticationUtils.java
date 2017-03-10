@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Date;
+
 import org.springframework.util.Base64Utils;
 
 /**
@@ -22,56 +23,64 @@ import org.springframework.util.Base64Utils;
  * @author sdai
  */
 public enum AuthenticationUtils {
-    INSTANCE;
-    
-    public boolean verifyNPlusOneAuth(String correctChallenge, String signature, PublicKey pub) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        long incremented = Long.parseLong(correctChallenge) + 1;
-        
-        byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(incremented).array();
-        Signature sig = Signature.getInstance("SHA256withECDSA");
-        sig.initVerify(pub);
-        sig.update(data);
-        
-        return sig.verify(Base64Utils.decodeFromString(signature));
-    }
-    
-    public String generateNPlusOneCredential(String challenge, PrivateKey key) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-        Signature sig = Signature.getInstance("SHA256withECDSA");
-        sig.initSign(key);
-        
-        long response = Long.parseLong(challenge) + 1;
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        byte[] data = buffer.putLong(response).array();
-        sig.update(data);
-        byte[] signature = sig.sign();
-        return Base64Utils.encodeToString(signature);
-    }
-    
-    public String signMessage(String message, Date timestamp, PrivateKey key) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-        StringBuilder sb = new StringBuilder();
-        String toSign = sb.append(message).append(":").append(Long.toString(timestamp.getTime())).toString();
-        byte[] data = toSign.getBytes(StandardCharsets.UTF_8);
-        
-        Signature sig = Signature.getInstance("SHA256withECDSA");
-        sig.initSign(key);
-        sig.update(data);
-        byte[] signature = sig.sign();
-        return Base64Utils.encodeToString(signature);
-    }
-    
-    public boolean verifySignedMessage(String message, Date timestamp, PublicKey publicKey, String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        String messageToVerify = new StringBuilder().append(message).append(":").append(Long.toString(timestamp.getTime())).toString();
-        byte[] data = messageToVerify.getBytes(StandardCharsets.UTF_8);
-        byte[] signatureBytes = Base64Utils.decodeFromString(signature);
-        
-        Signature sig = Signature.getInstance("SHA256withECDSA");
-        sig.initVerify(publicKey);
-        sig.update(data);
-        return sig.verify(signatureBytes);
-    }
-    
-    public String generateChallenge() {
-        SecureRandom rand = new SecureRandom();
-        return Long.toString(rand.nextLong());
-    }
+	INSTANCE;
+
+	public static final String ALGORITHM = "SHA256withRSA";
+	public static final String KEYTYPE = "RSA";
+
+	public boolean verifyNPlusOneAuth(String correctChallenge, String signature, PublicKey pub)
+			throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+		long incremented = Long.parseLong(correctChallenge) + 1;
+
+		byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(incremented).array();
+		Signature sig = Signature.getInstance(ALGORITHM);
+		sig.initVerify(pub);
+		sig.update(data);
+
+		return sig.verify(Base64Utils.decodeFromString(signature));
+	}
+
+	public String generateNPlusOneCredential(String challenge, PrivateKey key)
+			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+		Signature sig = Signature.getInstance(ALGORITHM);
+		sig.initSign(key);
+
+		long response = Long.parseLong(challenge) + 1;
+		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+		byte[] data = buffer.putLong(response).array();
+		sig.update(data);
+		byte[] signature = sig.sign();
+		return Base64Utils.encodeToString(signature);
+	}
+
+	public String signMessage(String message, Date timestamp, PrivateKey key)
+			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+		StringBuilder sb = new StringBuilder();
+		String toSign = sb.append(message).append(":").append(Long.toString(timestamp.getTime())).toString();
+		byte[] data = toSign.getBytes(StandardCharsets.UTF_8);
+
+		Signature sig = Signature.getInstance(ALGORITHM);
+		sig.initSign(key);
+		sig.update(data);
+		byte[] signature = sig.sign();
+		return Base64Utils.encodeToString(signature);
+	}
+
+	public boolean verifySignedMessage(String message, Date timestamp, PublicKey publicKey, String signature)
+			throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+		String messageToVerify = new StringBuilder().append(message).append(":")
+				.append(Long.toString(timestamp.getTime())).toString();
+		byte[] data = messageToVerify.getBytes(StandardCharsets.UTF_8);
+		byte[] signatureBytes = Base64Utils.decodeFromString(signature);
+
+		Signature sig = Signature.getInstance(ALGORITHM);
+		sig.initVerify(publicKey);
+		sig.update(data);
+		return sig.verify(signatureBytes);
+	}
+
+	public String generateChallenge() {
+		SecureRandom rand = new SecureRandom();
+		return Long.toString(rand.nextLong());
+	}
 }

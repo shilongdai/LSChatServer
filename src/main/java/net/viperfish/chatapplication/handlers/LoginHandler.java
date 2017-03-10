@@ -94,7 +94,8 @@ public final class LoginHandler extends ValidatedRequestHandler {
 		String suppliedCredential = req.getData();
 		PublicKey userKey = null;
 		try {
-			userKey = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(u.getCredential()));
+			userKey = KeyFactory.getInstance(AuthenticationUtils.KEYTYPE)
+					.generatePublic(new X509EncodedKeySpec(u.getCredential()));
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
 			logger.warn("Invalid Key", ex);
 			status.setStatus(LSResponse.INTERNAL_ERROR, "Invalid Public Key");
