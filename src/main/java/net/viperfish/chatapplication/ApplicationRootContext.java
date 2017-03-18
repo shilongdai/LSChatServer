@@ -63,6 +63,7 @@ import net.viperfish.chatapplication.filters.AuthenticationFilter;
 import net.viperfish.chatapplication.handlers.AddAssociateHandler;
 import net.viperfish.chatapplication.handlers.AssociateLookupHandler;
 import net.viperfish.chatapplication.handlers.DeleteAssociateHandler;
+import net.viperfish.chatapplication.handlers.GetPublicKeyHandler;
 import net.viperfish.chatapplication.handlers.LoginHandler;
 import net.viperfish.chatapplication.handlers.MessagingHandler;
 import net.viperfish.chatapplication.handlers.SearchUserHandler;
@@ -218,6 +219,7 @@ public class ApplicationRootContext implements AsyncConfigurer {
 		application.addHandler(LSRequest.LS_ADD_ASSOCIATE, new AddAssociateHandler(userDatabase));
 		application.addHandler(LSRequest.LS_LOOKUP_USER, new SearchUserHandler(userDatabase));
 		application.addHandler(LSRequest.LS_DELETE_ASSOCIATE, new DeleteAssociateHandler(userDatabase));
+		application.addHandler(LSRequest.LS_LOOKUP_KEY, new GetPublicKeyHandler(userDatabase));
 		application.addFilter(new AuthenticationFilter());
 		return application;
 	}
@@ -252,9 +254,18 @@ public class ApplicationRootContext implements AsyncConfigurer {
 	@Bean
 	public SSLContextConfigurator sslConf() {
 		SSLContextConfigurator config = new SSLContextConfigurator();
-		config.setKeyStoreFile("key.jks");
-		config.setKeyStorePass("123456");
-		return config;
+		String keyStorePath;
+		try {
+			keyStorePath = configuration().getString(GlobalConfig.SERVER_KEYSTORE);
+			if (keyStorePath == null) {
+				keyStorePath = GlobalConfig.SERVER_KEYSTORE_DEFAULT;
+			}
+			config.setKeyStoreFile(keyStorePath);
+			config.setKeyStorePass(configuration().getString(GlobalConfig.SERVER_KEYPASS));
+			return config;
+		} catch (ConfigurationException | IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Bean

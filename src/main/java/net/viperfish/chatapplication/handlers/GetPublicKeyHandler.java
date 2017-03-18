@@ -9,11 +9,11 @@ import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.ValidatedRequestHandler;
 
-public final class GetPacketHandler extends ValidatedRequestHandler {
+public final class GetPublicKeyHandler extends ValidatedRequestHandler {
 
 	private UserDatabase userDB;
 
-	public GetPacketHandler(UserDatabase userDB) {
+	public GetPublicKeyHandler(UserDatabase userDB) {
 		this.userDB = userDB;
 	}
 

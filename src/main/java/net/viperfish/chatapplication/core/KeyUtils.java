@@ -25,39 +25,39 @@ import java.security.spec.X509EncodedKeySpec;
  * @author sdai
  */
 public enum KeyUtils {
-    INSTANCE;
-    
-    public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
-        SecureRandom rand = new SecureRandom();
-        generator.initialize(384, rand);
-        return generator.generateKeyPair();
-    }
-    
-    public void dumpKeyPair(Path pubPath, Path privPath, KeyPair keypair) throws IOException {
-        Files.createDirectories(pubPath.getParent());
-        Files.createDirectories(privPath.getParent());
-        
-        Files.write(pubPath, keypair.getPublic().getEncoded(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-        Files.write(privPath, keypair.getPrivate().getEncoded(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-    }
-    
-    public PublicKey readPublicKey(Path p) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] keyBytes = Files.readAllBytes(p);
-        X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(keyBytes);
-        PublicKey publicKey = KeyFactory.getInstance("EC").generatePublic(publicSpec);
-        return publicKey;
-    }
-    
-    public PrivateKey readPrivateKey(Path p) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] privateKeyBytes = Files.readAllBytes(p);
-        PKCS8EncodedKeySpec privateSpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        PrivateKey priv = KeyFactory.getInstance("EC").generatePrivate(privateSpec);
-        return priv;
-    }
-    
-    public void writePublicKey(Path publicKey, PublicKey pub) throws IOException {
-        byte[] keyBytes = pub.getEncoded();
-        Files.write(publicKey, keyBytes, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-    }
+	INSTANCE;
+
+	public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+		SecureRandom rand = new SecureRandom();
+		generator.initialize(384, rand);
+		return generator.generateKeyPair();
+	}
+
+	public void dumpKeyPair(Path pubPath, Path privPath, KeyPair keypair) throws IOException {
+		Files.createDirectories(pubPath.getParent());
+		Files.createDirectories(privPath.getParent());
+
+		Files.write(pubPath, keypair.getPublic().getEncoded(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		Files.write(privPath, keypair.getPrivate().getEncoded(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+	}
+
+	public PublicKey readPublicKey(Path p) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		byte[] keyBytes = Files.readAllBytes(p);
+		X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(keyBytes);
+		PublicKey publicKey = KeyFactory.getInstance(AuthenticationUtils.KEYTYPE).generatePublic(publicSpec);
+		return publicKey;
+	}
+
+	public PrivateKey readPrivateKey(Path p) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		byte[] privateKeyBytes = Files.readAllBytes(p);
+		PKCS8EncodedKeySpec privateSpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+		PrivateKey priv = KeyFactory.getInstance(AuthenticationUtils.KEYTYPE).generatePrivate(privateSpec);
+		return priv;
+	}
+
+	public void writePublicKey(Path publicKey, PublicKey pub) throws IOException {
+		byte[] keyBytes = pub.getEncoded();
+		Files.write(publicKey, keyBytes, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+	}
 }

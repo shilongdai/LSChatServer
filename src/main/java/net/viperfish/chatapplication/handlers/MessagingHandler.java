@@ -40,6 +40,7 @@ public final class MessagingHandler extends ValidatedRequestHandler {
 		resp.setSource(req.getSource());
 		resp.setTarget(req.getAttribute("target"));
 		resp.setData(req.getData());
+		resp.setAttribute("encryptionCredential", req.getAttribute("encryptionCredential"));
 
 		return new LSResponse(LSResponse.SUCCESS, "Message Proccessed", "");
 	}
