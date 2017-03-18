@@ -5,6 +5,7 @@
  */
 package net.viperfish.chatapplication.core;
 
+import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -14,6 +15,9 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import org.springframework.util.Base64Utils;
@@ -82,5 +86,10 @@ public enum AuthenticationUtils {
 	public String generateChallenge() {
 		SecureRandom rand = new SecureRandom();
 		return Long.toString(rand.nextLong());
+	}
+
+	public X509Certificate bytesToCertificate(byte[] certBytes) throws CertificateException {
+		ByteArrayInputStream in = new ByteArrayInputStream(certBytes);
+		return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(in);
 	}
 }

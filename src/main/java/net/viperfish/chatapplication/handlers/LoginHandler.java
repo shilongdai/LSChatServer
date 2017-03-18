@@ -6,13 +6,12 @@
 package net.viperfish.chatapplication.handlers;
 
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,11 +93,11 @@ public final class LoginHandler extends ValidatedRequestHandler {
 		String suppliedCredential = req.getData();
 		PublicKey userKey = null;
 		try {
-			userKey = KeyFactory.getInstance(AuthenticationUtils.KEYTYPE)
-					.generatePublic(new X509EncodedKeySpec(u.getCredential()));
-		} catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-			logger.warn("Invalid Key", ex);
-			status.setStatus(LSResponse.INTERNAL_ERROR, "Invalid Public Key");
+			X509Certificate userCert = AuthenticationUtils.INSTANCE.bytesToCertificate(u.getCredential());
+			userKey = userCert.getPublicKey();
+		} catch (CertificateException ex) {
+			logger.warn("Invalid Certificate", ex);
+			status.setStatus(LSResponse.INTERNAL_ERROR, "Invalid Certificate Key");
 			req.getSession().invalidate();
 			return status;
 		}

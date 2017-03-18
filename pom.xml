@@ -163,6 +163,11 @@
             <artifactId>hibernate-search-orm</artifactId>
             <version>5.5.3.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.55</version>
+        </dependency>
     </dependencies>
     
     
