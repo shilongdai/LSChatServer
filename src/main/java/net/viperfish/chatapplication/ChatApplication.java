@@ -5,11 +5,19 @@
  */
 package net.viperfish.chatapplication;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.websockets.DataFrame;
+import org.glassfish.grizzly.websockets.WebSocket;
+import org.glassfish.grizzly.websockets.WebSocketApplication;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import java.util.HashMap;
-import java.util.Map;
+
 import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.JsonGenerator;
 import net.viperfish.chatapplication.core.LSFilter;
@@ -18,132 +26,228 @@ import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.RequestHandler;
 import net.viperfish.chatapplication.core.UserRegister;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.glassfish.grizzly.websockets.DataFrame;
-import org.glassfish.grizzly.websockets.WebSocket;
-import org.glassfish.grizzly.websockets.WebSocketApplication;
 
 /**
- *
+ * The main request dispatcher that dispatches requests to specific handlers.
+ * This class handles websocket packets, deserializes the JSON request in the
+ * packet into {@link LSRequest}, and relay the request to its handler based on
+ * the request type. This class is not designed for thread safety
+ * 
  * @author sdai
+ *
  */
 public class ChatApplication extends WebSocketApplication {
 
-    private final Map<Long, RequestHandler> handlerMapper;
-    private final JsonGenerator generator;
-    private UserRegister socketMapper;
-    private final Logger logger;
-    private final DefaultFilterChain filterChain;
+	private final Map<Long, RequestHandler> handlerMapper;
+	private final JsonGenerator generator;
+	private UserRegister socketMapper;
+	private final Logger logger;
+	private final DefaultFilterChain filterChain;
 
-    public ChatApplication() {
-        handlerMapper = new HashMap<>();
-        generator = new JsonGenerator();
-        logger = LogManager.getLogger();
-        filterChain = new DefaultFilterChain();
-    }
+	/**
+	 * creates a {@link ChatApplication} object.
+	 */
+	public ChatApplication() {
+		handlerMapper = new HashMap<>();
+		generator = new JsonGenerator();
+		logger = LogManager.getLogger();
+		filterChain = new DefaultFilterChain();
+		socketMapper = new UserRegister();
+	}
 
-    public void setSocketMapper(UserRegister mapper) {
-        this.socketMapper = mapper;
-    }
+	/**
+	 * registers a handler for a type of request.
+	 * 
+	 * @param type
+	 *            the type of {@link LSRequest} that the handler can handles
+	 * @param handler
+	 *            the request handler
+	 */
+	public void addHandler(Long type, RequestHandler handler) {
+		handlerMapper.put(type, handler);
+	}
 
-    public void addHandler(Long type, RequestHandler handler) {
-        handlerMapper.put(type, handler);
-    }
+	/**
+	 * converts an incoming websocket packet data in JSON into
+	 * {@link LSRequest}.
+	 * 
+	 * @param data
+	 *            the JSON request
+	 * @param socket
+	 *            the originating websocket
+	 * @return a {@link LSRequest} that represents the incoming JSON packet
+	 * @throws JsonParseException
+	 *             if the incoming websocket packet is not proper JSON
+	 * @throws JsonMappingException
+	 *             if the incoming websocket packet fails to map to a
+	 *             {@link LSRequest}
+	 */
+	private LSRequest convertToRequest(String data, WebSocket socket) throws JsonParseException, JsonMappingException {
+		LSRequest req = generator.fromJson(LSRequest.class, data);
+		req.setSocket(socket);
+		return req;
+	}
 
-    private void updateSessionInfo(LSRequest req) {
-        req.setSession(DefaultLSSession.getSession(req.getSource()));
-    }
+	/**
+	 * sends the {@link LSPayload} from a handler to its target client as
+	 * requested by the handler. This method sends the constructed
+	 * {@link LSPayload} from a {@link RequestHandler} to another client if
+	 * required (The {@link LSPayload} has a target). If the target is offline,
+	 * this method changes the {@link LSResponse} status to 203 User Offline. If
+	 * the target of the {@link LSPayload} is null, this method does nothings
+	 *
+	 * @param payload
+	 *            the payload to sent if there is a target
+	 * @param status
+	 *            the status to change if the target is offline
+	 * @throws JsonGenerationException
+	 *             if failed to generate JSON payload from {@link LSPayload}
+	 * @throws JsonMappingException
+	 *             if failed to map values in {@link LSPayload} to JSON fields
+	 */
+	private void sendPayload(LSPayload payload, LSResponse status)
+			throws JsonGenerationException, JsonMappingException {
+		// check if the handler requires to send a payload
+		if (payload.getTarget() != null) {
+			// get the websocket for the target
+			WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
+			if (targetSocket == null || !targetSocket.isConnected()) {
+				// set status to 203 if the target of the payload is offline
+				status.setStatus(LSResponse.USER_OFFLINE, "Target User Offline");
+			} else {
+				// serializes the payload into JSON
+				String sentData = generator.toJson(payload);
+				logger.info("Sending:\n" + sentData);
+				// send the serialized payload to the target client
+				targetSocket.send(sentData);
+			}
+		}
+	}
 
-    private LSRequest convertToRequest(String data, WebSocket socket) throws JsonParseException, JsonMappingException {
-        LSRequest req = generator.fromJson(LSRequest.class, data);
-        req.setSocket(socket);
-        return req;
-    }
+	/**
+	 * dispatches a {@link LSRequest} to an appropriate {@link RequestHandler}
+	 * based on its type.
+	 * 
+	 * @param req
+	 *            the incoming request to process
+	 * @return the response or result to the request. The status depends on the
+	 *         handler. However, if no handler is found, the status is 202 No
+	 *         Handler.
+	 * @throws JsonGenerationException
+	 *             if failed to generate JSON for the {@link LSPayload}
+	 * @throws JsonMappingException
+	 *             if failed to map {@link LSPayload} fields into JSON fields
+	 */
+	private LSResponse handleRequest(LSRequest req) throws JsonGenerationException, JsonMappingException {
+		// set up the mathcing Requesthandler
+		RequestHandler handler = handlerMapper.get(req.getType());
+		LSPayload payload = new LSPayload();
+		LSResponse status = new LSResponse();
 
-    private void sendPayload(LSPayload payload, LSResponse status) throws JsonGenerationException, JsonMappingException {
-        if (payload.getTarget() != null) {
-            WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
-            if (targetSocket == null || !targetSocket.isConnected()) {
-                status.setStatus(LSResponse.USER_OFFLINE, "Target User Offline");
-            } else {
-                String sentData = generator.toJson(payload);
-                logger.info("Sending:\n" + sentData);
-                targetSocket.send(sentData);
-            }
-        }
-    }
+		if (handler != null) {
+			// runs the request through the filter chain, and then process the
+			// request with the handler
+			filterChain.setEndpoint(handler);
+			status = filterChain.process(req, payload);
 
-    private LSResponse handleRequest(LSRequest req, WebSocket socket) throws JsonGenerationException, JsonMappingException {
-        RequestHandler handler = handlerMapper.get(req.getType());
-        LSPayload payload = new LSPayload();
-        LSResponse status = new LSResponse();
-        if (handler != null) {
-            filterChain.setEndpoint(handler);
-            status = filterChain.process(req, payload);
-            sendPayload(payload, status);
-        } else {
-            logger.info("No Handler Present For Message Type:" + req.getType());
-            status.setStatus(LSResponse.NO_HANDLER, "No Handler Found For Type" + req.getType());
-        }
-        return status;
-    }
+			// send the payload to another client if any
+			sendPayload(payload, status);
+		} else {
+			logger.info("No Handler Present For Message Type:" + req.getType());
+			status.setStatus(LSResponse.NO_HANDLER, "No Handler Found For Type" + req.getType());
+		}
+		return status;
+	}
 
-    private void sendStatus(LSPayload statusPayload, LSResponse status, WebSocket origin) throws JsonGenerationException, JsonMappingException {
-        statusPayload.setData(generator.toJson(status));
-        statusPayload.setSource(null);
-        statusPayload.setType(LSPayload.LS_STATUS);
-        origin.send(generator.toJson(statusPayload));
-    }
+	/**
+	 * sends the response of the handler back to the origin of the
+	 * {@link LSRequest}.
+	 * 
+	 * @param statusPayload
+	 *            the {@link LSPayload} that will contain the {@link LSResponse}
+	 *            data
+	 * @param status
+	 *            the result of the handler to the origin client
+	 * @param origin
+	 *            the websocket of the source client
+	 * @throws JsonGenerationException
+	 *             if failed to generate JSON from the {@link LSPayload}
+	 * @throws JsonMappingException
+	 *             if failed to map {@link LSPayload} fields into JSON fields.
+	 */
+	private void sendStatus(LSPayload statusPayload, LSResponse status, WebSocket origin)
+			throws JsonGenerationException, JsonMappingException {
+		// load the LSResponse into the datagram body of the LSPayload
+		statusPayload.setData(generator.toJson(status));
+		// no source for this payload because it originates from server
+		statusPayload.setSource(null);
+		statusPayload.setType(LSPayload.LS_STATUS);
+		// sends the payload to the orinator
+		origin.send(generator.toJson(statusPayload));
+	}
 
-    @Override
-    public void onMessage(WebSocket socket, String text) {
-        logger.info("Received Message:" + text);
-        LSResponse status = new LSResponse();
-        LSPayload statusPayload = new LSPayload();
-        statusPayload.setSource(null);
-        try {
-            LSRequest req = convertToRequest(text, socket);
-            if (req.getType() == null) {
-                logger.warn("Invalid Message:" + text);
-                return;
-            }
-            updateSessionInfo(req);
+	/**
+	 * handles an incoming websocket packet and send result and payload to
+	 * clients.
+	 * 
+	 * @param socket
+	 *            the originating socket of the request
+	 * @param text
+	 *            the string body of the websocket packet
+	 */
+	@Override
+	public void onMessage(WebSocket socket, String text) {
+		logger.info("Received Message:" + text);
 
-            status = handleRequest(req, socket);
+		// initialize the result objects
+		LSResponse status = new LSResponse();
+		LSPayload statusPayload = new LSPayload();
+		statusPayload.setSource(null);
+		try {
+			// turn the text request into request object
+			LSRequest req = convertToRequest(text, socket);
+			if (req.getType() == null) {
+				logger.warn("Invalid Message:" + text);
+				return;
+			}
 
-            if (socketMapper.getSocket(req.getSource()) != null) {
-                statusPayload.setTarget(req.getSource());
-            } else {
-                statusPayload.setTarget(null);
-            }
-        } catch (JsonParseException | JsonMappingException | JsonGenerationException ex) {
-            logger.warn("Exception Caught:" + ex);
-            status.setStatus(LSResponse.INTERNAL_ERROR, "JSON Processing Error ");
-        } finally {
-            try {
-                sendStatus(statusPayload, status, socket);
-            } catch (JsonGenerationException | JsonMappingException ex) {
-                logger.warn("Exception Caught While sending status", ex);
-                socket.send("{'status':204, 'reason':\"\", 'additional':\"\"}");
-            }
-        }
-    }
+			// handles the request
+			status = handleRequest(req);
+		} catch (Exception ex) {
+			// set the status to internal error if any exceptions occurred
+			logger.warn("Exception Caught:" + ex);
+			status.setStatus(LSResponse.INTERNAL_ERROR, ex.getMessage());
+		} finally {
+			try {
+				sendStatus(statusPayload, status, socket);
+			} catch (Exception ex) {
+				logger.warn("Exception Caught While sending internal error status", ex);
+				socket.send("{'status':204, 'reason':\"\", 'additional':\"\"}");
+			}
+		}
+	}
 
-    @Override
-    public void onClose(WebSocket socket, DataFrame frame) {
-        logger.info("Closing Socket");
-        String username = socketMapper.getUsername(socket);
-        if(username != null) {
-            logger.info("Invalidating session for " + username);
-            DefaultLSSession.getSession(username).invalidate();
-        }
-        socketMapper.unregister(socket);
-        super.onClose(socket, frame);
-    }
+	/**
+	 * cleans up user data on socket close
+	 * 
+	 * @param socket
+	 * @param frame
+	 */
+	@Override
+	public void onClose(WebSocket socket, DataFrame frame) {
+		logger.info("Closing Socket");
+		String username = socketMapper.getUsername(socket);
+		if (username != null) {
+			// delete session data for this socket
+			logger.info("Invalidating session for " + username);
+			DefaultLSSession.getSession(username).invalidate();
+		}
+		socketMapper.unregister(socket);
+		super.onClose(socket, frame);
+	}
 
-    public void addFilter(LSFilter filter) {
-        this.filterChain.addFilter(filter);
-    }
-    
+	public void addFilter(LSFilter filter) {
+		this.filterChain.addFilter(filter);
+	}
+
 }

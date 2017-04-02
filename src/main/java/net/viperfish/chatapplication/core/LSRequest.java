@@ -139,11 +139,7 @@ public class LSRequest implements Serializable {
 
 	@JsonIgnore
 	public LSSession getSession() {
-		return this.session;
-	}
-
-	public void setSession(LSSession session) {
-		this.session = session;
+		return DefaultLSSession.getSession(source);
 	}
 
 	@Override

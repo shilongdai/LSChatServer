@@ -20,6 +20,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import org.bouncycastle.crypto.Mac;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.springframework.util.Base64Utils;
 
 /**
@@ -91,5 +95,17 @@ public enum AuthenticationUtils {
 	public X509Certificate bytesToCertificate(byte[] certBytes) throws CertificateException {
 		ByteArrayInputStream in = new ByteArrayInputStream(certBytes);
 		return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(in);
+	}
+
+	public String generateHMAC(byte[] key, Date timestamp, String data) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(timestamp.getTime()).append(data);
+		byte[] toMac = sb.toString().getBytes(StandardCharsets.UTF_8);
+		Mac hmac = new HMac(new SHA256Digest());
+		hmac.init(new KeyParameter(key));
+		hmac.update(toMac, 0, toMac.length);
+		byte[] out = new byte[32];
+		hmac.doFinal(out, 0);
+		return Base64Utils.encodeToString(out);
 	}
 }

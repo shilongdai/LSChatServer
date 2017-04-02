@@ -71,4 +71,11 @@ public final class TestUtils {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	public static byte[] generateMACKey() {
+		SecureRandom rand = new SecureRandom();
+		byte[] key = new byte[32];
+		rand.nextBytes(key);
+		return key;
+	}
 }

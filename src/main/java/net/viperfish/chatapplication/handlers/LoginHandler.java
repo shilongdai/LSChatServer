@@ -7,7 +7,6 @@ package net.viperfish.chatapplication.handlers;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -15,8 +14,10 @@ import java.security.cert.X509Certificate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.util.Base64Utils;
 
 import net.viperfish.chatapplication.core.AuthenticationUtils;
+import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
@@ -34,30 +35,15 @@ public final class LoginHandler extends ValidatedRequestHandler {
 	private final UserDatabase userDB;
 	private final UserRegister reg;
 	private final Logger logger;
-	private final PrivateKey priv;
 
-	public LoginHandler(UserDatabase userDB, UserRegister reg, PrivateKey priv) {
+	public LoginHandler(UserDatabase userDB, UserRegister reg) {
 		this.userDB = userDB;
 		this.reg = reg;
 		logger = LogManager.getLogger();
-		this.priv = priv;
 	}
 
 	@Override
 	public void init() {
-	}
-
-	private void setChallengeSession(LSRequest req, LSResponse status)
-			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-		status.setStatus(LSResponse.CHALLENGE);
-		String chg = "0";
-		while (chg.equals("0")) {
-			chg = AuthenticationUtils.INSTANCE.generateChallenge();
-		}
-
-		String challengeResponse = AuthenticationUtils.INSTANCE.generateNPlusOneCredential(req.getData(), priv);
-		status.setData(chg + ";" + challengeResponse);
-		req.getSession().setAttribute("imposedChallenge", chg);
 	}
 
 	@Override
@@ -66,6 +52,9 @@ public final class LoginHandler extends ValidatedRequestHandler {
 			return false;
 		}
 		if (req.getData() == null || req.getData().length() == 0) {
+			return false;
+		}
+		if (req.getAttribute("signature") == null || req.getAttribute("signature").isEmpty()) {
 			return false;
 		}
 		return true;
@@ -79,18 +68,8 @@ public final class LoginHandler extends ValidatedRequestHandler {
 			status.setStatus(LSResponse.LOGIN_FAIL, "User" + req.getSource() + " not found");
 			return status;
 		}
-		try {
-			if (req.getSession().getAttribute("imposedChallenge", String.class) == null) {
-				setChallengeSession(req, status);
-				return status;
-			}
-		} catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException ex) {
-			this.logger.warn("cannot generate credential", ex);
-			status.setStatus(LSResponse.INTERNAL_ERROR);
-			req.getSession().invalidate();
-			return status;
-		}
-		String suppliedCredential = req.getData();
+
+		byte[] macKey = Base64Utils.decodeFromString(req.getData());
 		PublicKey userKey = null;
 		try {
 			X509Certificate userCert = AuthenticationUtils.INSTANCE.bytesToCertificate(u.getCredential());
@@ -102,14 +81,14 @@ public final class LoginHandler extends ValidatedRequestHandler {
 			return status;
 		}
 		try {
-			if (AuthenticationUtils.INSTANCE.verifyNPlusOneAuth(
-					req.getSession().getAttribute("imposedChallenge", String.class), suppliedCredential, userKey)) {
+			if (AuthenticationUtils.INSTANCE.verifySignedMessage(req.getData(), req.getTimeStamp(), userKey,
+					req.getAttribute("signature"))) {
 				status.setStatus(LSResponse.SUCCESS);
 				reg.register(u.getUsername(), req.getSocket());
-				req.getSession().setAttribute("publicKey", userKey);
+				DefaultLSSession.createSession(req.getSource());
+				req.getSession().setAttribute("macKey", macKey);
 			} else {
 				status.setStatus(LSResponse.LOGIN_FAIL, "Username or password incorrect");
-				req.getSession().invalidate();
 				return status;
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
