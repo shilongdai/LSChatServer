@@ -44,7 +44,6 @@ public class LSRequest implements Serializable {
 	private Long type;
 	private String data;
 	private transient WebSocket socket;
-	private transient LSSession session;
 
 	public LSRequest(String from, Map<String, String> attributes, Date timeStamp, Long type, String data,
 			WebSocket sock) {

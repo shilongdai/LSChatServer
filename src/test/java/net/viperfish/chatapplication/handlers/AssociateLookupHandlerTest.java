@@ -60,6 +60,7 @@ public class AssociateLookupHandlerTest {
 		userRegister.register("test2", new MockWebSocket());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testLookupAll() throws JsonParseException, JsonMappingException {
 		AssociateLookupHandler handler = new AssociateLookupHandler(userdb, userRegister);

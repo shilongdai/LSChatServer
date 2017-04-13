@@ -40,19 +40,19 @@ public class ChatApplication extends WebSocketApplication {
 
 	private final Map<Long, RequestHandler> handlerMapper;
 	private final JsonGenerator generator;
-	private UserRegister socketMapper;
+	private final UserRegister socketMapper;
 	private final Logger logger;
 	private final DefaultFilterChain filterChain;
 
 	/**
 	 * creates a {@link ChatApplication} object.
 	 */
-	public ChatApplication() {
+	public ChatApplication(UserRegister reg) {
 		handlerMapper = new HashMap<>();
 		generator = new JsonGenerator();
 		logger = LogManager.getLogger();
 		filterChain = new DefaultFilterChain();
-		socketMapper = new UserRegister();
+		socketMapper = reg;
 	}
 
 	/**
@@ -107,11 +107,13 @@ public class ChatApplication extends WebSocketApplication {
 	 */
 	private void sendPayload(LSPayload payload, LSResponse status)
 			throws JsonGenerationException, JsonMappingException {
+		logger.info("sending payload to:" + payload.getTarget());
 		// check if the handler requires to send a payload
 		if (payload.getTarget() != null) {
 			// get the websocket for the target
 			WebSocket targetSocket = socketMapper.getSocket(payload.getTarget());
-			if (targetSocket == null || !targetSocket.isConnected()) {
+			logger.info("Websocket for:" + payload.getTarget() + "->" + targetSocket);
+			if (targetSocket == null) {
 				// set status to 203 if the target of the payload is offline
 				status.setStatus(LSResponse.USER_OFFLINE, "Target User Offline");
 			} else {

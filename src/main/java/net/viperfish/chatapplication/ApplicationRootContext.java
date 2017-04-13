@@ -209,7 +209,7 @@ public class ApplicationRootContext implements AsyncConfigurer {
 	public ChatApplication chatApplication()
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException,
 			FileNotFoundException, CertificateException, UnrecoverableEntryException, ConfigurationException {
-		ChatApplication application = new ChatApplication();
+		ChatApplication application = new ChatApplication(this.userRegister());
 		application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister()));
 		application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
 		application.addHandler(LSRequest.LS_ASSOCIATE_LOOKUP,

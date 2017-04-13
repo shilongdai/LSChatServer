@@ -26,7 +26,6 @@ import net.viperfish.chatapplication.core.DefaultLSSession;
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
-import net.viperfish.chatapplication.core.LSSession;
 import net.viperfish.chatapplication.core.User;
 import net.viperfish.chatapplication.core.UserDatabase;
 import net.viperfish.chatapplication.core.UserRegister;
@@ -41,7 +40,6 @@ public class LoginHandlerTest {
 	private static UserDatabase userDB;
 	private static UserRegister register;
 	private static KeyPair testKey;
-	private static KeyPair serverKey;
 
 	@BeforeClass
 	public static void init() throws NoSuchAlgorithmException {
@@ -53,7 +51,7 @@ public class LoginHandlerTest {
 			throw new RuntimeException(e);
 		}
 		register = new UserRegister();
-		serverKey = TestUtils.generateKeyPair();
+		TestUtils.generateKeyPair();
 	}
 
 	@Test
@@ -94,7 +92,6 @@ public class LoginHandlerTest {
 		socket = new MockWebSocket();
 		KeyPair wrongKeys = TestUtils.generateKeyPair();
 		DefaultLSSession.createSession("sample");
-		LSSession sampleSession = DefaultLSSession.getSession("sample");
 		req = new LSRequest("sample", new HashMap<>(), new Date(), LSRequest.LS_LOGIN,
 				Base64Utils.encodeToString(macKey), socket);
 		req.getAttributes().put("signature",

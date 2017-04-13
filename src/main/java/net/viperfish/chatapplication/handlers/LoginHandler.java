@@ -87,8 +87,10 @@ public final class LoginHandler extends ValidatedRequestHandler {
 				reg.register(u.getUsername(), req.getSocket());
 				DefaultLSSession.createSession(req.getSource());
 				req.getSession().setAttribute("macKey", macKey);
+				logger.info("User Logged In:" + req.getSource());
 			} else {
 				status.setStatus(LSResponse.LOGIN_FAIL, "Username or password incorrect");
+				logger.info("Incorrect Signature:" + req.getSource());
 				return status;
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {

@@ -35,6 +35,7 @@ public class Bootstrap {
 		Logger logger = LogManager.getLogger();
 		ThreadContext.put("id", UUID.randomUUID().toString());
 		ThreadContext.put("username", "journalUser");
+		@SuppressWarnings("resource")
 		AnnotationConfigApplicationContext rootContext = new AnnotationConfigApplicationContext(
 				ApplicationRootContext.class);
 		rootContext.start();
