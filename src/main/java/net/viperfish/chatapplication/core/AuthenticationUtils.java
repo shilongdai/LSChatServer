@@ -6,13 +6,11 @@
 package net.viperfish.chatapplication.core;
 
 import java.io.ByteArrayInputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -27,76 +25,116 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.springframework.util.Base64Utils;
 
 /**
- *
+ * An utility enum that includes methods for anthenticating users and messages.
+ * 
  * @author sdai
  */
 public enum AuthenticationUtils {
 	INSTANCE;
 
+	/**
+	 * The signing algorithm
+	 */
 	public static final String ALGORITHM = "SHA256withRSA";
+	/**
+	 * The key type for the algorithm
+	 */
 	public static final String KEYTYPE = "RSA";
 
-	public boolean verifyNPlusOneAuth(String correctChallenge, String signature, PublicKey pub)
-			throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-		long incremented = Long.parseLong(correctChallenge) + 1;
-
-		byte[] data = ByteBuffer.allocate(Long.BYTES).putLong(incremented).array();
-		Signature sig = Signature.getInstance(ALGORITHM);
-		sig.initVerify(pub);
-		sig.update(data);
-
-		return sig.verify(Base64Utils.decodeFromString(signature));
-	}
-
-	public String generateNPlusOneCredential(String challenge, PrivateKey key)
-			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-		Signature sig = Signature.getInstance(ALGORITHM);
-		sig.initSign(key);
-
-		long response = Long.parseLong(challenge) + 1;
-		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-		byte[] data = buffer.putLong(response).array();
-		sig.update(data);
-		byte[] signature = sig.sign();
-		return Base64Utils.encodeToString(signature);
-	}
-
-	public String signMessage(String message, Date timestamp, PrivateKey key)
-			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+	/**
+	 * generates a signature of a message based on its content and timestamp
+	 * 
+	 * @param message
+	 *            the message content to sign
+	 * @param timestamp
+	 *            the timestamp of the message to sign
+	 * @param key
+	 *            the private key to sign the message with
+	 * @return the signature
+	 * @throws SignatureException
+	 *             if error occurred while signing
+	 * @throws IllegalArgumentException
+	 *             if the key is not proper for this signing algorithm or if the
+	 *             signing algorithm is unsupported by the JCA.
+	 */
+	public String signMessage(String message, Date timestamp, PrivateKey key) throws SignatureException {
 		StringBuilder sb = new StringBuilder();
 		String toSign = sb.append(message).append(":").append(Long.toString(timestamp.getTime())).toString();
 		byte[] data = toSign.getBytes(StandardCharsets.UTF_8);
-
-		Signature sig = Signature.getInstance(ALGORITHM);
-		sig.initSign(key);
-		sig.update(data);
-		byte[] signature = sig.sign();
-		return Base64Utils.encodeToString(signature);
+		try {
+			Signature sig = Signature.getInstance(ALGORITHM);
+			sig.initSign(key);
+			sig.update(data);
+			byte[] signature = sig.sign();
+			return Base64Utils.encodeToString(signature);
+		} catch (InvalidKeyException | NoSuchAlgorithmException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
+	/**
+	 * verifies a signature generated from its content and timestamp
+	 * 
+	 * @param message
+	 *            the message content
+	 * @param timestamp
+	 *            the message timestamp
+	 * @param publicKey
+	 *            the public key of the signer
+	 * @param signature
+	 *            the signature encoded in Base64
+	 * @return <code>true</code> if the signature is valid, <code>false</code>
+	 *         if the signature is invalid
+	 * @throws SignatureException
+	 *             if an error occurred while verifying the signature.
+	 * @throws IllegalArgumentException
+	 *             if the public key is not appropriate or if the signing
+	 *             algorithm is unsupported.
+	 */
 	public boolean verifySignedMessage(String message, Date timestamp, PublicKey publicKey, String signature)
-			throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+			throws SignatureException {
 		String messageToVerify = new StringBuilder().append(message).append(":")
 				.append(Long.toString(timestamp.getTime())).toString();
 		byte[] data = messageToVerify.getBytes(StandardCharsets.UTF_8);
 		byte[] signatureBytes = Base64Utils.decodeFromString(signature);
 
-		Signature sig = Signature.getInstance(ALGORITHM);
-		sig.initVerify(publicKey);
-		sig.update(data);
-		return sig.verify(signatureBytes);
+		try {
+			Signature sig = Signature.getInstance(ALGORITHM);
+			sig.initVerify(publicKey);
+			sig.update(data);
+			return sig.verify(signatureBytes);
+		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
-	public String generateChallenge() {
-		SecureRandom rand = new SecureRandom();
-		return Long.toString(rand.nextLong());
-	}
-
+	/**
+	 * de-serialize a certificate encoded X509 certificate to a Java object
+	 * 
+	 * @param certBytes
+	 *            the serialized certificate
+	 * @return the de-serialized certificate
+	 * @throws CertificateException
+	 *             if failed to convert the encoded bytes into a valid
+	 *             certificate
+	 */
 	public X509Certificate bytesToCertificate(byte[] certBytes) throws CertificateException {
 		ByteArrayInputStream in = new ByteArrayInputStream(certBytes);
 		return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(in);
 	}
 
+	/**
+	 * generates an SHA256 HMAC digest of a message based on its content and
+	 * timestamp
+	 * 
+	 * @param key
+	 *            the key to generate the MAC
+	 * @param timestamp
+	 *            the timestamp of the message
+	 * @param data
+	 *            the content of the message
+	 * @return the HMAC code encoded in Base64
+	 */
 	public String generateHMAC(byte[] key, Date timestamp, String data) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(timestamp.getTime()).append(data);

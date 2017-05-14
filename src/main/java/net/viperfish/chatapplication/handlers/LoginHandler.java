@@ -5,8 +5,6 @@
  */
 package net.viperfish.chatapplication.handlers;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -93,7 +91,7 @@ public final class LoginHandler extends ValidatedRequestHandler {
 				logger.info("Incorrect Signature:" + req.getSource());
 				return status;
 			}
-		} catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
+		} catch (SignatureException ex) {
 			logger.warn("cannot verify signature", ex);
 			status.setStatus(LSResponse.LOGIN_FAIL, "Server Cannot Verify Signature");
 			req.getSession().invalidate();

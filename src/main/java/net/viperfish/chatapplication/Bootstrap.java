@@ -32,10 +32,12 @@ import net.viperfish.chatapplication.core.UserDatabase;
 public class Bootstrap {
 
 	public static void main(String[] args) {
+		// starts the logger
 		Logger logger = LogManager.getLogger();
 		ThreadContext.put("id", UUID.randomUUID().toString());
 		ThreadContext.put("username", "journalUser");
 		@SuppressWarnings("resource")
+		// starts the spring framework
 		AnnotationConfigApplicationContext rootContext = new AnnotationConfigApplicationContext(
 				ApplicationRootContext.class);
 		rootContext.start();
@@ -48,6 +50,7 @@ public class Bootstrap {
 			while (true) {
 				System.out.print("command:");
 				String command = inputReader.nextLine();
+				// end the program if shutdown
 				if (command.equalsIgnoreCase("shutdown")) {
 					break;
 				}
@@ -63,6 +66,7 @@ public class Bootstrap {
 						break;
 					}
 					try {
+						// read the user certificate from a file
 						URI u = new URI(parts[2]);
 						Certificate cert = KeyUtils.INSTANCE.readCertificate(Paths.get(u));
 						User user = new User();

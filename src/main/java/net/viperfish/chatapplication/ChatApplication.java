@@ -248,6 +248,12 @@ public class ChatApplication extends WebSocketApplication {
 		super.onClose(socket, frame);
 	}
 
+	/**
+	 * adds a filter to the chat server
+	 * 
+	 * @param filter
+	 *            the filter to add
+	 */
 	public void addFilter(LSFilter filter) {
 		this.filterChain.addFilter(filter);
 	}
