@@ -73,7 +73,8 @@ class DefaultFilterChain implements LSFilterChain {
 	}
 
 	/**
-	 * process the given request through the chain
+	 * process the given request through the chain. Each filters are invoked
+	 * based on the orer of its addition into the filter chain.
 	 * 
 	 * @param req
 	 *            the request to process

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.viperfish.chatapplication.core;
 
 import java.io.ByteArrayInputStream;
@@ -58,9 +53,11 @@ public enum AuthenticationUtils {
 	 *             signing algorithm is unsupported by the JCA.
 	 */
 	public String signMessage(String message, Date timestamp, PrivateKey key) throws SignatureException {
+		// merge the message data and timestamp into one string for signature.
 		StringBuilder sb = new StringBuilder();
 		String toSign = sb.append(message).append(":").append(Long.toString(timestamp.getTime())).toString();
 		byte[] data = toSign.getBytes(StandardCharsets.UTF_8);
+		// sign the merged string
 		try {
 			Signature sig = Signature.getInstance(ALGORITHM);
 			sig.initSign(key);
@@ -93,11 +90,13 @@ public enum AuthenticationUtils {
 	 */
 	public boolean verifySignedMessage(String message, Date timestamp, PublicKey publicKey, String signature)
 			throws SignatureException {
+		// get the message and timestamp into one string for verification
 		String messageToVerify = new StringBuilder().append(message).append(":")
 				.append(Long.toString(timestamp.getTime())).toString();
 		byte[] data = messageToVerify.getBytes(StandardCharsets.UTF_8);
 		byte[] signatureBytes = Base64Utils.decodeFromString(signature);
 
+		// verification
 		try {
 			Signature sig = Signature.getInstance(ALGORITHM);
 			sig.initVerify(publicKey);
@@ -136,9 +135,12 @@ public enum AuthenticationUtils {
 	 * @return the HMAC code encoded in Base64
 	 */
 	public String generateHMAC(byte[] key, Date timestamp, String data) {
+		// get the data and timestamp into one string to hash
 		StringBuilder sb = new StringBuilder();
 		sb.append(timestamp.getTime()).append(data);
 		byte[] toMac = sb.toString().getBytes(StandardCharsets.UTF_8);
+
+		// the hmacing
 		Mac hmac = new HMac(new SHA256Digest());
 		hmac.init(new KeyParameter(key));
 		hmac.update(toMac, 0, toMac.length);

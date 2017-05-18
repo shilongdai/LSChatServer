@@ -66,21 +66,20 @@ public final class LoginHandler extends ValidatedRequestHandler {
 			status.setStatus(LSResponse.LOGIN_FAIL, "User" + req.getSource() + " not found");
 			return status;
 		}
-
-		byte[] macKey = Base64Utils.decodeFromString(req.getData());
 		PublicKey userKey = null;
 		try {
 			X509Certificate userCert = AuthenticationUtils.INSTANCE.bytesToCertificate(u.getCredential());
 			userKey = userCert.getPublicKey();
 		} catch (CertificateException ex) {
 			logger.warn("Invalid Certificate", ex);
-			status.setStatus(LSResponse.INTERNAL_ERROR, "Invalid Certificate Key");
+			status.setStatus(LSResponse.INTERNAL_ERROR, "Invalid Certificate Format");
 			req.getSession().invalidate();
 			return status;
 		}
 		try {
 			if (AuthenticationUtils.INSTANCE.verifySignedMessage(req.getData(), req.getTimeStamp(), userKey,
 					req.getAttribute("signature"))) {
+				byte[] macKey = Base64Utils.decodeFromString(req.getData());
 				status.setStatus(LSResponse.SUCCESS);
 				reg.register(u.getUsername(), req.getSocket());
 				DefaultLSSession.createSession(req.getSource());

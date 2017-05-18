@@ -11,11 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
@@ -23,18 +21,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- *
+ * A utility class containing functions for persisting and reading files for
+ * PKI.
+ * 
  * @author sdai
  */
 public enum KeyUtils {
 	INSTANCE;
-
-	public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-		KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
-		SecureRandom rand = new SecureRandom();
-		generator.initialize(384, rand);
-		return generator.generateKeyPair();
-	}
 
 	public void dumpKeyPair(Path pubPath, Path privPath, KeyPair keypair) throws IOException {
 		Files.createDirectories(pubPath.getParent());

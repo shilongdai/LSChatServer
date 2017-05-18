@@ -6,23 +6,23 @@
 package net.viperfish.chatapplication.core;
 
 /**
- *
+ * An exceptional event occurring in the filter chain.
+ * 
  * @author sdai
  */
 public class FilterException extends Exception {
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3568391698152514818L;
 	private LSResponse status;
 
-    public FilterException(LSResponse status) {
-        this.status = status;
-    }
+	public FilterException(LSResponse status) {
+		this.status = status;
+	}
 
-    public LSResponse getStatus() {
-        return status;
-    }
-    
-    
+	public LSResponse getStatus() {
+		return status;
+	}
+
 }

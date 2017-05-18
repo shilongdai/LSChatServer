@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * A session for a logged in user. The {@link DefaultLSSession} keeps the data
+ * of a logged in user for the duration of his logged in time. This class is not
+ * designed for threading.
+ * 
  * @author sdai
  **/
 public class DefaultLSSession implements LSSession {
