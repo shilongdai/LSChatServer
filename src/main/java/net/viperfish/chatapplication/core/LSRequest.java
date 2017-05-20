@@ -21,7 +21,11 @@ import org.glassfish.grizzly.websockets.WebSocket;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- *
+ * a request sent from the client to the server. The client request would be in
+ * the JSON format on arrival to the server. The response would then be passed
+ * through filters and be processed by a {@link RequestHandler}. This class is
+ * not designed for thread safety.
+ * 
  * @author sdai
  */
 public class LSRequest implements Serializable {
@@ -30,12 +34,33 @@ public class LSRequest implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4397309950514696170L;
+	/**
+	 * Login request
+	 */
 	public static final long LS_LOGIN = 1;
+	/**
+	 * Chat message request
+	 */
 	public static final long LS_MESSAGE = 2;
+	/**
+	 * Get associates request
+	 */
 	public static final long LS_ASSOCIATE_LOOKUP = 3;
+	/**
+	 * Add associate request
+	 */
 	public static final long LS_ADD_ASSOCIATE = 4;
+	/**
+	 * Look up user request
+	 */
 	public static final long LS_LOOKUP_USER = 5;
+	/**
+	 * Delete associate request
+	 */
 	public static final long LS_DELETE_ASSOCIATE = 6;
+	/**
+	 * Get public key request
+	 */
 	public static final long LS_LOOKUP_KEY = 7;
 
 	private String source;

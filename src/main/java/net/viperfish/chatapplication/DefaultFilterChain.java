@@ -20,10 +20,8 @@ import net.viperfish.chatapplication.core.LSResponse;
 import net.viperfish.chatapplication.core.RequestHandler;
 
 /**
- * The container of filters. The filter chain is used by the filters to pass the
- * request to the next level of filters. If the calling filter is the last
- * filter of the chain, a request handler is invoked. This class is not designed
- * with thread safety.
+ * The default implementation of a container of filters. This class is not
+ * designed with thread safety.
  * 
  * @author sdai
  *

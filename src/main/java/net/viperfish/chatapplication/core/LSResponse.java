@@ -10,83 +10,79 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * a response from server to client.
+ * 
  * @author sdai
  */
 public class LSResponse implements Serializable {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 304907510435821437L;
 	public static final int SUCCESS = 200;
-    public static final int LOGIN_FAIL = 201;
-    public static final int NO_HANDLER=202;
-    public static final int USER_OFFLINE = 203;
-    public static final int INTERNAL_ERROR = 204;
-    public static final int CHALLENGE = 205;
-    public static final int AUTHENTICATE_FAIL = 206;
-    public static final int USER_NOT_FOUND = 207;
-    public static final int INVALID_REQUEST = 208;
-    
-    private int status;
-    
-    private String reason;
-    
-    private String data;
-    
-    private Map<String, String> attributes;
+	public static final int LOGIN_FAIL = 201;
+	public static final int NO_HANDLER = 202;
+	public static final int USER_OFFLINE = 203;
+	public static final int INTERNAL_ERROR = 204;
+	public static final int CHALLENGE = 205;
+	public static final int AUTHENTICATE_FAIL = 206;
+	public static final int USER_NOT_FOUND = 207;
+	public static final int INVALID_REQUEST = 208;
 
-    public LSResponse(int status, String reason, String data) {
-        this.status = status;
-        this.reason = reason;
-        this.data = data;
-        attributes = new HashMap<>();
-    }
-    
-    
-    public LSResponse() {
-        status = 200;
-        this.reason = "";
-        data = "";
-        attributes = new HashMap<>();
-    }
-    
-    public int getStatus() {
-        return status;
-    }
-    
-    public String getReason() {
-        return reason;
-    }
-    
-    public void setStatus(int status) {
-        this.status = status;
-    }
+	private int status;
 
-    public void setStatus(int status, String reason) {
-        this.status = status;
-        this.reason = reason;
-    }
+	private String reason;
 
-    public String getData() {
-        return data;
-    }
+	private String data;
 
-    public void setData(String data) {
-        this.data = data;
-    }
+	private Map<String, String> attributes;
 
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
+	public LSResponse(int status, String reason, String data) {
+		this.status = status;
+		this.reason = reason;
+		this.data = data;
+		attributes = new HashMap<>();
+	}
 
-    public void setAttributes(Map<String, String> attributes) {
-        this.attributes = attributes;
-    }
-    
-    
+	public LSResponse() {
+		status = 200;
+		this.reason = "";
+		data = "";
+		attributes = new HashMap<>();
+	}
 
-    
-    
+	public int getStatus() {
+		return status;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public void setStatus(int status, String reason) {
+		this.status = status;
+		this.reason = reason;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
 }

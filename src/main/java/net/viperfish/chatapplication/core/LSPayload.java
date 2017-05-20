@@ -12,7 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- *
+ * a datagram from the server to the client. A {@link LSPayload} object can
+ * either encapsulate a {@link LSResponse} object in its data section, or it can
+ * contain a packet to another client processed by a handler. In transmission,
+ * the {@link LSPayload} would be serialized to JSON format and transmitted to a
+ * client via websocket. Currently, there are two type of payload, status
+ * message and chat message. This class is not designed for thread safety.
+ * 
  * @author sdai
  */
 public class LSPayload implements Serializable, Comparable<LSPayload> {
@@ -21,7 +27,13 @@ public class LSPayload implements Serializable, Comparable<LSPayload> {
 	 * 
 	 */
 	private static final long serialVersionUID = 2007965376179027059L;
+	/**
+	 * message type for a status message
+	 */
 	public static final int LS_STATUS = 1;
+	/**
+	 * message type for a chat message
+	 */
 	public static final int LS_MESSAGE = 2;
 
 	private String source;
