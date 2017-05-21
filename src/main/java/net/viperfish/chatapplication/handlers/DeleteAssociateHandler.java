@@ -5,6 +5,8 @@
  */
 package net.viperfish.chatapplication.handlers;
 
+import java.util.Collection;
+
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
@@ -40,7 +42,7 @@ public class DeleteAssociateHandler extends ValidatedRequestHandler {
 	}
 
 	@Override
-	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+	public LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> resp) {
 		String toDel = req.getData();
 		String user = req.getSource();
 

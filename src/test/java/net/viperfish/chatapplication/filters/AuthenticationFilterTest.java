@@ -4,6 +4,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -34,10 +36,10 @@ public class AuthenticationFilterTest {
 		req.getAttributes().put("target", "sdai");
 		req.getAttributes().put("mac",
 				AuthenticationUtils.INSTANCE.generateHMAC(macKey, req.getTimeStamp(), req.getData()));
-		LSPayload payload = new LSPayload();
+		List<LSPayload> payloads = new LinkedList<>();
 		AuthenticationFilter filter = new AuthenticationFilter();
 		MockFilterChain mock = new MockFilterChain();
-		filter.doFilter(req, payload, mock);
+		filter.doFilter(req, payloads, mock);
 	}
 
 }

@@ -6,6 +6,7 @@
 package net.viperfish.chatapplication.handlers;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,7 +56,7 @@ public class SearchUserHandler extends ValidatedRequestHandler {
 	}
 
 	@Override
-	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+	public LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> resp) {
 		String keyword = req.getAttribute("keyword");
 		logger.info("Keyword:" + keyword);
 		LSResponse response = new LSResponse();

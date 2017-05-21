@@ -5,6 +5,7 @@
  */
 package net.viperfish.chatapplication;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ class DefaultFilterChain implements LSFilterChain {
 	 *            the payload to postprocess
 	 * @return the status of the request
 	 */
-	public LSResponse process(LSRequest req, LSPayload payload) {
+	public LSResponse process(LSRequest req, Collection<LSPayload> payload) {
 		current = 0;
 		try {
 			return doFilter(req, payload);
@@ -101,7 +102,7 @@ class DefaultFilterChain implements LSFilterChain {
 	 * @return the status of the request
 	 */
 	@Override
-	public LSResponse doFilter(LSRequest req, LSPayload resp) throws FilterException {
+	public LSResponse doFilter(LSRequest req, Collection<LSPayload> resp) throws FilterException {
 		if (current < filters.size()) {
 			// go to the next filter if the current is not the last filter
 			LSFilter filter = filters.get(current);

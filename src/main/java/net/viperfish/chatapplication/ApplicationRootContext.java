@@ -66,6 +66,8 @@ import net.viperfish.chatapplication.handlers.DeleteAssociateHandler;
 import net.viperfish.chatapplication.handlers.GetPublicKeyHandler;
 import net.viperfish.chatapplication.handlers.LoginHandler;
 import net.viperfish.chatapplication.handlers.MessagingHandler;
+import net.viperfish.chatapplication.handlers.PersistentPayloadWrapper;
+import net.viperfish.chatapplication.handlers.RetrieveUnsentPacketsHandler;
 import net.viperfish.chatapplication.handlers.SearchUserHandler;
 
 @Configuration
@@ -211,13 +213,15 @@ public class ApplicationRootContext implements AsyncConfigurer {
 			FileNotFoundException, CertificateException, UnrecoverableEntryException, ConfigurationException {
 		ChatApplication application = new ChatApplication(this.userRegister());
 		application.addHandler(LSRequest.LS_LOGIN, new LoginHandler(userDatabase, this.userRegister()));
-		application.addHandler(LSRequest.LS_MESSAGE, new MessagingHandler());
+		application.addHandler(LSRequest.LS_MESSAGE,
+				new PersistentPayloadWrapper(new MessagingHandler(), this.userRegister(), this.userDatabase));
 		application.addHandler(LSRequest.LS_ASSOCIATE_LOOKUP,
 				new AssociateLookupHandler(userDatabase, this.userRegister()));
 		application.addHandler(LSRequest.LS_ADD_ASSOCIATE, new AddAssociateHandler(userDatabase));
 		application.addHandler(LSRequest.LS_LOOKUP_USER, new SearchUserHandler(userDatabase));
 		application.addHandler(LSRequest.LS_DELETE_ASSOCIATE, new DeleteAssociateHandler(userDatabase));
 		application.addHandler(LSRequest.LS_LOOKUP_KEY, new GetPublicKeyHandler(userDatabase));
+		application.addHandler(LSRequest.LS_RETRIEVE_UNSENT, new RetrieveUnsentPacketsHandler(userDatabase));
 		application.addFilter(new AuthenticationFilter());
 		return application;
 	}

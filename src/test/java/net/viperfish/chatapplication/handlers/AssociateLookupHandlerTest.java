@@ -5,6 +5,8 @@
  */
 package net.viperfish.chatapplication.handlers;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -63,6 +65,7 @@ public class AssociateLookupHandlerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLookupAll() throws JsonParseException, JsonMappingException {
+		List<LSPayload> resps = new LinkedList<>();
 		AssociateLookupHandler handler = new AssociateLookupHandler(userdb, userRegister);
 		handler.init();
 		LSRequest associateRequest = new LSRequest();
@@ -72,7 +75,7 @@ public class AssociateLookupHandlerTest {
 		associateRequest.getAttributes().put("checkOnline", "false");
 
 		LSPayload resp = new LSPayload();
-		LSResponse stat = handler.handleRequest(associateRequest, resp);
+		LSResponse stat = handler.handleRequest(associateRequest, resps);
 
 		Assert.assertEquals(LSResponse.SUCCESS, stat.getStatus());
 		JsonGenerator generator = new JsonGenerator();
@@ -83,11 +86,13 @@ public class AssociateLookupHandlerTest {
 
 		associateRequest.getAttributes().put("checkOnline", "true");
 
-		stat = handler.handleRequest(associateRequest, resp);
+		stat = handler.handleRequest(associateRequest, resps);
 		associates = generator.fromJson(Set.class, stat.getData());
 		Assert.assertEquals(LSResponse.SUCCESS, stat.getStatus());
 		Assert.assertEquals(1, associates.size());
 		Assert.assertEquals(true, associates.contains("test2"));
+
+		Assert.assertEquals(0, resps.size());
 	}
 
 }

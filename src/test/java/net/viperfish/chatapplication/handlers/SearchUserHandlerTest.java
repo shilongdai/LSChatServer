@@ -5,6 +5,8 @@
  */
 package net.viperfish.chatapplication.handlers;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -40,11 +42,11 @@ public class SearchUserHandlerTest {
 	@Test
 	public void testLookup() throws JsonParseException, JsonMappingException {
 		LSRequest req = new LSRequest();
+		List<LSPayload> payloads = new LinkedList<>();
 		req.setType(LSRequest.LS_LOOKUP_USER);
 		req.getAttributes().put("keyword", "test");
 
-		LSPayload payload = new LSPayload();
-		LSResponse resp = handler.handleRequest(req, payload);
+		LSResponse resp = handler.handleRequest(req, payloads);
 
 		Assert.assertEquals(LSResponse.SUCCESS, resp.getStatus());
 		JsonGenerator generator = new JsonGenerator();
@@ -53,7 +55,7 @@ public class SearchUserHandlerTest {
 		Assert.assertEquals(true, results.contains("test1"));
 		Assert.assertEquals(true, results.contains("test2"));
 		Assert.assertEquals(false, results.contains("somerandomguy"));
-
+		Assert.assertEquals(0, payloads.size());
 	}
 
 }

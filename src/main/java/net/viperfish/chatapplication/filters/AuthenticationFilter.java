@@ -1,5 +1,7 @@
 package net.viperfish.chatapplication.filters;
 
+import java.util.Collection;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,10 +26,11 @@ public class AuthenticationFilter implements LSFilter {
 	}
 
 	@Override
-	public LSResponse doFilter(LSRequest req, LSPayload resp, LSFilterChain chain) throws FilterException {
+	public LSResponse doFilter(LSRequest req, Collection<LSPayload> respSet, LSFilterChain chain)
+			throws FilterException {
 		if (req.getType() == LSRequest.LS_LOGIN) {
 			logger.info("Not Processing Login Messages");
-			return chain.doFilter(req, resp);
+			return chain.doFilter(req, respSet);
 		}
 		String mac = req.getAttribute("mac");
 		if (mac == null) {
@@ -41,7 +44,7 @@ public class AuthenticationFilter implements LSFilter {
 
 		if (AuthenticationUtils.INSTANCE.generateHMAC(macKey, req.getTimeStamp(), req.getData()).equals(mac)) {
 			logger.info("Message Authenticated");
-			LSResponse status = chain.doFilter(req, resp);
+			LSResponse status = chain.doFilter(req, respSet);
 			return status;
 		} else {
 			logger.info("Message authentication checked failed");

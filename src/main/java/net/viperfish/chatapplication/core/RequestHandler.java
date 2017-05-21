@@ -5,13 +5,15 @@
  */
 package net.viperfish.chatapplication.core;
 
+import java.util.Collection;
+
 /**
  *
  * @author sdai
  */
 public interface RequestHandler {
 
-    public void init();
+	public void init();
 
-    public LSResponse handleRequest(LSRequest req, LSPayload resp);
+	public LSResponse handleRequest(LSRequest req, Collection<LSPayload> resp);
 }

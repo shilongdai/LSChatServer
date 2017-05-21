@@ -6,6 +6,8 @@
 package net.viperfish.chatapplication;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -143,17 +145,18 @@ public class ChatApplication extends WebSocketApplication {
 	private LSResponse handleRequest(LSRequest req) throws JsonGenerationException, JsonMappingException {
 		// set up the mathcing Requesthandler
 		RequestHandler handler = handlerMapper.get(req.getType());
-		LSPayload payload = new LSPayload();
 		LSResponse status = new LSResponse();
-
+		List<LSPayload> resps = new LinkedList<>();
 		if (handler != null) {
 			// runs the request through the filter chain, and then process the
 			// request with the handler
 			filterChain.setEndpoint(handler);
-			status = filterChain.process(req, payload);
+			status = filterChain.process(req, resps);
 
 			// send the payload to another client if any
-			sendPayload(payload, status);
+			for (LSPayload payload : resps) {
+				sendPayload(payload, status);
+			}
 		} else {
 			logger.info("No Handler Present For Message Type:" + req.getType());
 			status.setStatus(LSResponse.NO_HANDLER, "No Handler Found For Type" + req.getType());
@@ -184,8 +187,11 @@ public class ChatApplication extends WebSocketApplication {
 		// no source for this payload because it originates from server
 		statusPayload.setSource(null);
 		statusPayload.setType(LSPayload.LS_STATUS);
+
+		String statusJSON = generator.toJson(statusPayload);
+		logger.info("Sending Status Back:" + statusJSON);
 		// sends the payload to the orinator
-		origin.send(generator.toJson(statusPayload));
+		origin.send(statusJSON);
 	}
 
 	/**

@@ -9,7 +9,24 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * a datagram from the server to the client. A {@link LSPayload} object can
@@ -21,6 +38,8 @@ import java.util.Objects;
  * 
  * @author sdai
  */
+@Entity
+@Table(name = "User_Message")
 public class LSPayload implements Serializable, Comparable<LSPayload> {
 
 	/**
@@ -42,6 +61,7 @@ public class LSPayload implements Serializable, Comparable<LSPayload> {
 	private Map<String, String> attr;
 	private Date timestamp;
 	private int type;
+	private long id;
 
 	public LSPayload() {
 		attr = new HashMap<>();
@@ -65,22 +85,36 @@ public class LSPayload implements Serializable, Comparable<LSPayload> {
 		this.data = data;
 	}
 
+	@Basic
+	@Column(name = "Source")
 	public String getSource() {
 		return source;
 	}
 
+	@Basic
+	@Column(name = "Target")
 	public String getTarget() {
 		return target;
 	}
 
+	@Basic
+	@Lob
+	@Column(name = "Data")
 	public String getData() {
 		return data;
 	}
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "User_Message_Attr", joinColumns = {
+			@JoinColumn(referencedColumnName = "Id", name = "PayloadId") })
+	@Column(name = "Value")
+	@MapKeyColumn(name = "Key")
 	public Map<String, String> getAttr() {
 		return attr;
 	}
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "MessageTime")
 	public Date getTimestamp() {
 		return timestamp;
 	}
@@ -93,6 +127,8 @@ public class LSPayload implements Serializable, Comparable<LSPayload> {
 		this.timestamp = timestamp;
 	}
 
+	@Basic
+	@Column(name = "Type")
 	public int getType() {
 		return type;
 	}
@@ -101,48 +137,69 @@ public class LSPayload implements Serializable, Comparable<LSPayload> {
 		this.type = type;
 	}
 
+	@Id
+	@JsonIgnore
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	@Override
 	public int hashCode() {
-		int hash = 7;
-		hash = 53 * hash + Objects.hashCode(this.source);
-		hash = 53 * hash + Objects.hashCode(this.target);
-		hash = 53 * hash + Objects.hashCode(this.data);
-		hash = 53 * hash + Objects.hashCode(this.attr);
-		hash = 53 * hash + Objects.hashCode(this.timestamp);
-		hash = 53 * hash + this.type;
-		return hash;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((attr == null) ? 0 : attr.hashCode());
+		result = prime * result + ((data == null) ? 0 : data.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+		result = prime * result + type;
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		final LSPayload other = (LSPayload) obj;
-		if (this.type != other.type) {
+		LSPayload other = (LSPayload) obj;
+		if (attr == null) {
+			if (other.attr != null)
+				return false;
+		} else if (!attr.equals(other.attr))
 			return false;
-		}
-		if (!Objects.equals(this.source, other.source)) {
+		if (data == null) {
+			if (other.data != null)
+				return false;
+		} else if (!data.equals(other.data))
 			return false;
-		}
-		if (!Objects.equals(this.target, other.target)) {
+		if (id != other.id)
 			return false;
-		}
-		if (!Objects.equals(this.data, other.data)) {
+		if (source == null) {
+			if (other.source != null)
+				return false;
+		} else if (!source.equals(other.source))
 			return false;
-		}
-		if (!Objects.equals(this.attr, other.attr)) {
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
 			return false;
-		}
-		if (!Objects.equals(this.timestamp, other.timestamp)) {
+		if (timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!timestamp.equals(other.timestamp))
 			return false;
-		}
+		if (type != other.type)
+			return false;
 		return true;
 	}
 

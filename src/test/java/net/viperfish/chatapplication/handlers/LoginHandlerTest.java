@@ -12,6 +12,8 @@ import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.glassfish.grizzly.websockets.WebSocket;
 import org.junit.Assert;
@@ -57,6 +59,7 @@ public class LoginHandlerTest {
 	@Test
 	public void testLoginHandlerSuccess() throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		register.unregister("sample");
+		List<LSPayload> payloads = new LinkedList<>();
 		DefaultLSSession.createSession("sample");
 		WebSocket socket = new MockWebSocket();
 		LoginHandler handler = new LoginHandler(userDB, register);
@@ -65,17 +68,18 @@ public class LoginHandlerTest {
 				Base64Utils.encodeToString(macKey), socket);
 		req.getAttributes().put("signature",
 				AuthenticationUtils.INSTANCE.signMessage(req.getData(), req.getTimeStamp(), testKey.getPrivate()));
-		LSPayload payload = new LSPayload();
-		LSResponse resp = handler.handleRequest(req, payload);
+		LSResponse resp = handler.handleRequest(req, payloads);
 
 		Assert.assertEquals(LSResponse.SUCCESS, resp.getStatus());
 		Assert.assertNotEquals(null, register.getSocket("sample"));
 		Assert.assertArrayEquals(macKey, DefaultLSSession.getSession("sample").getAttribute("macKey", byte[].class));
+		Assert.assertEquals(0, payloads.size());
 	}
 
 	@Test
 	public void testLoginHandlerFail() throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		register.unregister("sample");
+		List<LSPayload> payloads = new LinkedList<>();
 		LoginHandler handler = new LoginHandler(userDB, register);
 		byte[] macKey = TestUtils.generateMACKey();
 		LSRequest req;
@@ -84,8 +88,7 @@ public class LoginHandlerTest {
 		req = new LSRequest("noexist", new HashMap<>(), new Date(), LSRequest.LS_LOGIN,
 				Base64Utils.encodeToString(macKey), socket);
 		req.getAttributes().put("signature", "random stuff");
-		LSPayload payload = new LSPayload();
-		LSResponse resp = handler.handleRequest(req, payload);
+		LSResponse resp = handler.handleRequest(req, payloads);
 		Assert.assertEquals(LSResponse.LOGIN_FAIL, resp.getStatus());
 		Assert.assertEquals(null, register.getSocket("noexist"));
 
@@ -96,10 +99,10 @@ public class LoginHandlerTest {
 				Base64Utils.encodeToString(macKey), socket);
 		req.getAttributes().put("signature",
 				AuthenticationUtils.INSTANCE.signMessage(req.getData(), req.getTimeStamp(), wrongKeys.getPrivate()));
-		payload = new LSPayload();
-		resp = handler.handleRequest(req, payload);
+		resp = handler.handleRequest(req, payloads);
 		Assert.assertEquals(LSResponse.LOGIN_FAIL, resp.getStatus());
 		Assert.assertEquals(null, register.getSocket("sample"));
 		Assert.assertEquals(false, req.getSession().containsAttribute("macKey"));
+		Assert.assertEquals(0, payloads.size());
 	}
 }

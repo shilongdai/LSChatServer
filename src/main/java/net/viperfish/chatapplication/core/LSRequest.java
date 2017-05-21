@@ -63,6 +63,11 @@ public class LSRequest implements Serializable {
 	 */
 	public static final long LS_LOOKUP_KEY = 7;
 
+	/**
+	 * Retrieve unsent message request
+	 */
+	public static final long LS_RETRIEVE_UNSENT = 8;
+
 	private String source;
 	private Map<String, String> attributes;
 	private Date timeStamp;

@@ -6,6 +6,7 @@
 package net.viperfish.chatapplication.handlers;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class AssociateLookupHandler extends ValidatedRequestHandler {
 	}
 
 	@Override
-	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+	public LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> resp) {
 		boolean onlineFilter = Boolean.parseBoolean(req.getAttribute("checkOnline"));
 		logger.info("Online filter:" + onlineFilter);
 		try {

@@ -1,13 +1,15 @@
 package net.viperfish.chatapplication.core;
 
+import java.util.Collection;
+
 public abstract class ValidatedRequestHandler implements RequestHandler {
 
 	public abstract boolean validate(LSRequest req);
 
-	public abstract LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp);
+	public abstract LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> resp);
 
 	@Override
-	public final LSResponse handleRequest(LSRequest req, LSPayload resp) {
+	public final LSResponse handleRequest(LSRequest req, Collection<LSPayload> resp) {
 		if (validate(req)) {
 			return wrappedHandleRequest(req, resp);
 		} else {

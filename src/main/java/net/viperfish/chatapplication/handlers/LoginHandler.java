@@ -9,6 +9,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +60,7 @@ public final class LoginHandler extends ValidatedRequestHandler {
 	}
 
 	@Override
-	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+	public LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> resp) {
 		User u = userDB.findByUsername(req.getSource());
 		LSResponse status = new LSResponse();
 		if (u == null) {
@@ -85,6 +86,13 @@ public final class LoginHandler extends ValidatedRequestHandler {
 				DefaultLSSession.createSession(req.getSource());
 				req.getSession().setAttribute("macKey", macKey);
 				logger.info("User Logged In:" + req.getSource());
+
+				// send unsent messages
+				for (int i = 0; i < u.getUnsentMessages().size(); ++i) {
+					resp.add(u.getUnsentMessages().get(i));
+				}
+				u.getUnsentMessages().clear();
+				userDB.save(u);
 			} else {
 				status.setStatus(LSResponse.LOGIN_FAIL, "Username or password incorrect");
 				logger.info("Incorrect Signature:" + req.getSource());

@@ -5,6 +5,8 @@
  */
 package net.viperfish.chatapplication.handlers;
 
+import java.util.Collection;
+
 import net.viperfish.chatapplication.core.LSPayload;
 import net.viperfish.chatapplication.core.LSRequest;
 import net.viperfish.chatapplication.core.LSResponse;
@@ -35,13 +37,15 @@ public final class MessagingHandler extends ValidatedRequestHandler {
 	}
 
 	@Override
-	public LSResponse wrappedHandleRequest(LSRequest req, LSPayload resp) {
+	public LSResponse wrappedHandleRequest(LSRequest req, Collection<LSPayload> respCollection) {
+		LSPayload resp = new LSPayload();
 		resp.setType(LSPayload.LS_MESSAGE);
 		resp.setSource(req.getSource());
 		resp.setTarget(req.getAttribute("target"));
 		resp.setData(req.getData());
 		resp.setAttribute("encryptionCredential", req.getAttribute("encryptionCredential"));
 		resp.setAttribute("endToEndSig", req.getAttribute("endToEndSig"));
+		respCollection.add(resp);
 		return new LSResponse(LSResponse.SUCCESS, "Message Proccessed", "");
 	}
 

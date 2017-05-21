@@ -5,6 +5,8 @@
  */
 package net.viperfish.chatapplication.core;
 
+import java.util.Collection;
+
 /**
  * A filter that processes {@link LSRequest} before the {@link RequestHandler}s
  * and {@link LSPayload} after the {@link RequestHandler}s. This class is used
@@ -33,5 +35,5 @@ public interface LSFilter {
 	 * @throws FilterException
 	 *             if any excpetional conditions occur.
 	 */
-	public LSResponse doFilter(LSRequest req, LSPayload resp, LSFilterChain chain) throws FilterException;
+	public LSResponse doFilter(LSRequest req, Collection<LSPayload> resp, LSFilterChain chain) throws FilterException;
 }
